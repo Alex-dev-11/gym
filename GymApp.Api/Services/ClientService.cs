@@ -27,7 +27,7 @@ public class ClientService : IClientService
                 Phone = c.Phone,
                 Email = c.Email,
                 RegistrationDate = c.RegistrationDate ?? DateTime.Now,
-                Status = c.Status.ToString()
+                Status = c.Status
             })
             .ToListAsync();
     }
@@ -45,7 +45,7 @@ public class ClientService : IClientService
                 Phone = c.Phone,
                 Email = c.Email,
                 RegistrationDate = c.RegistrationDate ?? DateTime.Now,
-                Status = c.Status.ToString()
+                Status = c.Status
             })
             .FirstOrDefaultAsync();
 
@@ -62,7 +62,7 @@ public class ClientService : IClientService
             Phone = dto.Phone,
             Email = dto.Email,
             RegistrationDate = DateTime.Now,
-            Status = ClientStatus.Active,
+            Status = "active",
             IsDeleted = false
         };
 
@@ -78,7 +78,7 @@ public class ClientService : IClientService
             Phone = client.Phone,
             Email = client.Email,
             RegistrationDate = client.RegistrationDate ?? DateTime.Now,
-            Status = client.Status.ToString()
+            Status = client.Status
         };
     }
 
@@ -106,7 +106,7 @@ public class ClientService : IClientService
             Phone = client.Phone,
             Email = client.Email,
             RegistrationDate = client.RegistrationDate ?? DateTime.Now,
-            Status = client.Status.ToString()
+            Status = client.Status
         };
     }
 

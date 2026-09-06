@@ -1,3 +1,4 @@
+using Npgsql;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using GymApp.Api.Data;
@@ -14,7 +15,6 @@ builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
-// 3. Подключаем DbContext (PostgreSQL)
 builder.Services.AddDbContext<GymDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 

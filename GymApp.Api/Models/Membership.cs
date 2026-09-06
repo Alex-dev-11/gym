@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GymApp.Api.Models;
 
@@ -19,8 +20,11 @@ public partial class Membership
 
     public virtual Client Client { get; set; } = null!;
 
-    public MembershipType Type { get; set; }
-    public MembershipStatus Status { get; set; }
+    [Column("type", TypeName = "membership_type_enum")]
+    public string Type { get; set; } = null!;
+
+    [Column("status", TypeName = "membership_status_enum")]
+    public string Status { get; set; } = null!;
 
     public virtual ICollection<Visit> Visits { get; set; } = new List<Visit>();
 }
