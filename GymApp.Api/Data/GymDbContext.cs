@@ -24,13 +24,6 @@ public partial class GymDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Регистрация PostgreSQL ENUM типов (маппятся в string в C#)
-        modelBuilder.HasPostgresEnum("client_status_enum", new[] { "active", "inactive", "blacklisted" });
-        modelBuilder.HasPostgresEnum("employee_position_enum", new[] { "administrator", "trainer", "manager", "director", "cleaner" });
-        modelBuilder.HasPostgresEnum("membership_status_enum", new[] { "active", "completed", "expired", "cancelled" });
-        modelBuilder.HasPostgresEnum("membership_type_enum", new[] { "single", "month", "year" });
-        modelBuilder.HasPostgresEnum("system_role_enum", new[] { "admin", "operator" });
-
         modelBuilder.Entity<Client>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("clients_pkey");
