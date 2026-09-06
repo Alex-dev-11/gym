@@ -1,8 +1,8 @@
-using GymApp.Api.DTOs;
-using GymApp.Api.Services;
+using GymApp.Api.DTOs.Clients;
+using GymApp.Api.Services.Clients;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GymApp.Api.Controllers;
+namespace GymApp.Api.Controllers.Clients;
 
 [ApiController]
 [Route("api/[controller]")]

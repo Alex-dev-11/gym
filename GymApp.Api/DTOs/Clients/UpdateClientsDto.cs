@@ -1,6 +1,6 @@
-namespace GymApp.Api.DTOs;
+namespace GymApp.Api.DTOs.Clients;
 
-public class CreateClientDto
+public class UpdateClientDto
 {
     public string LastName { get; set; } = null!;
     public string FirstName { get; set; } = null!;

@@ -2,7 +2,8 @@ using Npgsql;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using GymApp.Api.Data;
-using GymApp.Api.Services;
+using GymApp.Api.Services.Memberships;
+using GymApp.Api.Services.Clients;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -20,6 +21,8 @@ builder.Services.AddDbContext<GymDbContext>(options =>
 
 // 4. Регистрируем наши сервисы (Dependency Injection)
 builder.Services.AddScoped<IClientService, ClientService>();
+
+builder.Services.AddScoped<IMembershipService, MembershipService>();
 
 // 5. Подключаем Swagger (для тестирования API)
 builder.Services.AddEndpointsApiExplorer();

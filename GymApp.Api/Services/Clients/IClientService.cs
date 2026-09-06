@@ -1,6 +1,6 @@
-using GymApp.Api.DTOs;
+using GymApp.Api.DTOs.Clients;
 
-namespace GymApp.Api.Services;
+namespace GymApp.Api.Services.Clients;
 
 public interface IClientService
 {

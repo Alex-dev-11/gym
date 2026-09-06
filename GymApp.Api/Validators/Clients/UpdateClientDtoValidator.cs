@@ -1,11 +1,11 @@
 using FluentValidation;
-using GymApp.Api.DTOs;
+using GymApp.Api.DTOs.Clients;
 
 namespace GymApp.Api.Validators;
 
-public class CreateClientDtoValidator : AbstractValidator<CreateClientDto>
+public class UpdateClientDtoValidator : AbstractValidator<UpdateClientDto>
 {
-    public CreateClientDtoValidator()
+    public UpdateClientDtoValidator()
     {
         RuleFor(x => x.LastName)
             .NotEmpty().WithMessage("Фамилия обязательна")

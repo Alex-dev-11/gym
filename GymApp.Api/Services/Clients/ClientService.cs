@@ -1,9 +1,9 @@
 using GymApp.Api.Data;
-using GymApp.Api.DTOs;
+using GymApp.Api.DTOs.Clients;
 using GymApp.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace GymApp.Api.Services;
+namespace GymApp.Api.Services.Clients;
 
 public class ClientService : IClientService
 {
