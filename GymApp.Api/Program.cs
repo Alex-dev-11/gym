@@ -4,6 +4,8 @@ using FluentValidation.AspNetCore;
 using GymApp.Api.Data;
 using GymApp.Api.Services.Memberships;
 using GymApp.Api.Services.Clients;
+using GymApp.Api.Services.Visits;
+using GymApp.Api.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -24,6 +26,8 @@ builder.Services.AddScoped<IClientService, ClientService>();
 
 builder.Services.AddScoped<IMembershipService, MembershipService>();
 
+builder.Services.AddScoped<IVisitService, VisitService>();
+
 // 5. Подключаем Swagger (для тестирования API)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -37,6 +41,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(); // Swagger UI будет доступен по адресу /swagger
 }
 
+// Middleware для обработки исключений (должен быть ДО MapControllers)
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 

@@ -1,12 +1,22 @@
 using GymApp.Api.DTOs.Clients;
-
 namespace GymApp.Api.Services.Clients;
+
 
 public interface IClientService
 {
     Task<List<ClientResponseDto>> GetAllClientsAsync();
-    Task<ClientResponseDto?> GetClientByIdAsync(int id);
+
+    // ❌ Было: Task<ClientResponseDto?> GetClientByIdAsync(int id);
+    // ✅ Стало: Task<ClientResponseDto> GetClientByIdAsync(int id);
+    Task<ClientResponseDto> GetClientByIdAsync(int id);
+
     Task<ClientResponseDto> CreateClientAsync(CreateClientDto dto);
-    Task<ClientResponseDto?> UpdateClientAsync(int id, UpdateClientDto dto);
-    Task<bool> DeleteClientAsync(int id);
+
+    // ❌ Было: Task<ClientResponseDto?> UpdateClientAsync(int id, UpdateClientDto dto);
+    // ✅ Стало: Task<ClientResponseDto> UpdateClientAsync(int id, UpdateClientDto dto);
+    Task<ClientResponseDto> UpdateClientAsync(int id, UpdateClientDto dto);
+
+    // ❌ Было: Task<bool> DeleteClientAsync(int id);
+    // ✅ Стало: Task DeleteClientAsync(int id);
+    Task DeleteClientAsync(int id);
 }

@@ -7,29 +7,8 @@ namespace GymApp.Api.Controllers.Memberships;
 /// <summary>
 /// Контроллер для работы с абонементами.
 /// 
-/// ═══════════════════════════════════════════════════════════════
-/// ОТВЕТСТВЕННОСТЬ КОНТРОЛЛЕРА:
-/// ═══════════════════════════════════════════════════════════════
-/// 
-/// ✅ Принимает HTTP-запросы
-/// ✅ Извлекает параметры (из URL и тела запроса)
-/// ✅ Вызывает методы сервиса
-/// ✅ Возвращает HTTP-ответы с правильными статусами
-/// ✅ Обрабатывает исключения (превращает в HTTP-ошибки)
-/// 
-/// ❌ НЕ содержит бизнес-логики (это задача MembershipService)
-/// ❌ НЕ работает напрямую с БД
-/// ❌ НЕ валидирует данные (это задача FluentValidation)
-/// 
-/// ═══════════════════════════════════════════════════════════════
-/// ENDPOINTS:
-/// ═══════════════════════════════════════════════════════════════
-/// 
-/// GET    /api/memberships              → Список абонементов (с фильтрацией)
-/// GET    /api/memberships/{id}         → Один абонемент по ID
-/// POST   /api/memberships              → Создать новый абонемент
-/// PUT    /api/memberships/{id}         → Обновить абонемент
-/// DELETE /api/memberships/{id}         → Удалить абонемент
+/// ВАЖНО: Обработка исключений вынесена в ExceptionHandlingMiddleware.
+/// Контроллер содержит только HTTP-логику.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
@@ -37,13 +16,6 @@ public class MembershipsController : ControllerBase
 {
     private readonly IMembershipService _membershipService;
 
-    /// <summary>
-    /// Конструктор. Зависимости внедряются через DI.
-    /// 
-    /// Когда ASP.NET Core создаёт контроллер для обработки запроса,
-    /// он автоматически находит зарегистрированный IMembershipService
-    /// (через AddScoped в Program.cs) и передаёт его в конструктор.
-    /// </summary>
     public MembershipsController(IMembershipService membershipService)
     {
         _membershipService = membershipService;
@@ -52,16 +24,6 @@ public class MembershipsController : ControllerBase
     /// <summary>
     /// GET /api/memberships
     /// Получить список абонементов с опциональной фильтрацией.
-    /// 
-    /// Query-параметры:
-    /// - clientId (int?) — фильтр по ID клиента
-    /// - status (string?) — фильтр по статусу
-    /// 
-    /// Примеры:
-    /// - GET /api/memberships → все абонементы
-    /// - GET /api/memberships?clientId=5 → абонементы клиента №5
-    /// - GET /api/memberships?status=active → только активные
-    /// - GET /api/memberships?clientId=5&status=active → активные клиента №5
     /// </summary>
     [HttpGet]
     public async Task<ActionResult<IEnumerable<MembershipResponseDto>>> GetAll(
@@ -69,122 +31,62 @@ public class MembershipsController : ControllerBase
         [FromQuery] string? status = null)
     {
         var memberships = await _membershipService.GetAllAsync(clientId, status);
-        return Ok(memberships); // HTTP 200 + JSON
+        return Ok(memberships); // HTTP 200
     }
 
     /// <summary>
     /// GET /api/memberships/{id}
     /// Получить один абонемент по ID.
-    /// 
-    /// Если абонемент не найден → HTTP 404 Not Found.
+    /// Если не найден → middleware вернёт HTTP 404.
     /// </summary>
     [HttpGet("{id}")]
     public async Task<ActionResult<MembershipResponseDto>> GetById(int id)
     {
-        try
-        {
-            var membership = await _membershipService.GetByIdAsync(id);
-            return Ok(membership); // HTTP 200 + JSON
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { message = ex.Message }); // HTTP 404
-        }
+        var membership = await _membershipService.GetByIdAsync(id);
+        return Ok(membership); // HTTP 200
     }
 
     /// <summary>
     /// POST /api/memberships
     /// Создать новый абонемент.
-    /// 
-    /// Тело запроса (JSON):
-    /// {
-    ///   "clientId": 5,
-    ///   "type": "month",
-    ///   "startDate": "2026-09-06"
-    /// }
-    /// 
-    /// Если клиент не найден → HTTP 404 Not Found.
-    /// Если данные невалидны → HTTP 400 Bad Request (обработает FluentValidation).
+    /// Если клиент не найден → middleware вернёт HTTP 404.
+    /// Если бизнес-ошибка → middleware вернёт HTTP 400.
     /// </summary>
     [HttpPost]
     public async Task<ActionResult<MembershipResponseDto>> Create([FromBody] CreateMembershipDto dto)
     {
-        try
-        {
-            var membership = await _membershipService.CreateAsync(dto);
+        var membership = await _membershipService.CreateAsync(dto);
 
-            // HTTP 201 Created + JSON + ссылка на созданный ресурс
-            return CreatedAtAction(
-                actionName: nameof(GetById),
-                routeValues: new { id = membership.Id },
-                value: membership
-            );
-        }
-        catch (KeyNotFoundException ex)
-        {
-            // Клиент не найден
-            return NotFound(new { message = ex.Message }); // HTTP 404
-        }
-        catch (InvalidOperationException ex)
-        {
-            // Бизнес-ошибка (например, неизвестный тип абонемента)
-            return BadRequest(new { message = ex.Message }); // HTTP 400
-        }
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = membership.Id },
+            membership
+        ); // HTTP 201
     }
 
     /// <summary>
     /// PUT /api/memberships/{id}
-    /// Обновить абонемент.
-    /// 
-    /// Тело запроса (JSON):
-    /// {
-    ///   "status": "cancelled",
-    ///   "endDate": "2026-10-06"
-    /// }
-    /// 
-    /// Если абонемент не найден → HTTP 404 Not Found.
-    /// Если данные невалидны → HTTP 400 Bad Request.
+    /// Обновить абонемент (только статус или дата окончания).
+    /// Если не найден → middleware вернёт HTTP 404.
+    /// Если бизнес-ошибка → middleware вернёт HTTP 400.
     /// </summary>
     [HttpPut("{id}")]
     public async Task<ActionResult<MembershipResponseDto>> Update(int id, [FromBody] UpdateMembershipDto dto)
     {
-        try
-        {
-            var membership = await _membershipService.UpdateAsync(id, dto);
-            return Ok(membership); // HTTP 200 + JSON
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { message = ex.Message }); // HTTP 404
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message }); // HTTP 400
-        }
+        var membership = await _membershipService.UpdateAsync(id, dto);
+        return Ok(membership); // HTTP 200
     }
 
     /// <summary>
     /// DELETE /api/memberships/{id}
     /// Удалить абонемент.
-    /// 
-    /// Если абонемент не найден → HTTP 404 Not Found.
-    /// Если у абонемента есть посещения → HTTP 400 Bad Request.
+    /// Если не найден → middleware вернёт HTTP 404.
+    /// Если есть посещения → middleware вернёт HTTP 400.
     /// </summary>
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)
     {
-        try
-        {
-            await _membershipService.DeleteAsync(id);
-            return NoContent(); // HTTP 204 (успех, но нет тела ответа)
-        }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new { message = ex.Message }); // HTTP 404
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message }); // HTTP 400
-        }
+        await _membershipService.DeleteAsync(id);
+        return NoContent(); // HTTP 204
     }
 }

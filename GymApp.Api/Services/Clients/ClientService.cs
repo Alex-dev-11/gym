@@ -32,7 +32,8 @@ public class ClientService : IClientService
             .ToListAsync();
     }
 
-    public async Task<ClientResponseDto?> GetClientByIdAsync(int id)
+    // ✅ ВОЗВРАЩАЕМЫЙ ТИП: Task<ClientResponseDto> (без ?)
+    public async Task<ClientResponseDto> GetClientByIdAsync(int id)
     {
         var client = await _context.Clients
             .Where(c => c.Id == id && c.IsDeleted == false)
@@ -49,11 +50,36 @@ public class ClientService : IClientService
             })
             .FirstOrDefaultAsync();
 
+        // ❌ Было: return client; (мог вернуть null)
+        // ✅ Стало: бросаем исключение, middleware вернёт 404
+        if (client == null)
+        {
+            throw new KeyNotFoundException($"Клиент с ID {id} не найден");
+        }
+
         return client;
     }
 
     public async Task<ClientResponseDto> CreateClientAsync(CreateClientDto dto)
     {
+        // 💡 ЗАЩИТНАЯ ПРОВЕРКА: не существует ли клиент с таким телефоном или email?
+        // В БД есть UNIQUE constraints, но лучше проверить до попытки вставки,
+        // чтобы вернуть понятную ошибку (400), а не ошибку БД (500).
+        var existingPhone = await _context.Clients.AnyAsync(c => c.Phone == dto.Phone && !c.IsDeleted);
+        if (existingPhone)
+        {
+            throw new InvalidOperationException($"Клиент с телефоном {dto.Phone} уже существует");
+        }
+
+        if (!string.IsNullOrEmpty(dto.Email))
+        {
+            var existingEmail = await _context.Clients.AnyAsync(c => c.Email == dto.Email && !c.IsDeleted);
+            if (existingEmail)
+            {
+                throw new InvalidOperationException($"Клиент с email {dto.Email} уже существует");
+            }
+        }
+
         var client = new Client
         {
             LastName = dto.LastName,
@@ -82,12 +108,36 @@ public class ClientService : IClientService
         };
     }
 
-    public async Task<ClientResponseDto?> UpdateClientAsync(int id, UpdateClientDto dto)
+    // ✅ ВОЗВРАЩАЕМЫЙ ТИП: Task<ClientResponseDto> (без ?)
+    public async Task<ClientResponseDto> UpdateClientAsync(int id, UpdateClientDto dto)
     {
         var client = await _context.Clients.FindAsync(id);
 
+        // ❌ Было: if (client == null || client.IsDeleted == true) return null;
+        // ✅ Стало: бросаем исключение
         if (client == null || client.IsDeleted == true)
-            return null;
+        {
+            throw new KeyNotFoundException($"Клиент с ID {id} не найден");
+        }
+
+        // 💡 ПРОВЕРКА УНИКАЛЬНОСТИ: если меняется телефон/email, проверяем, что новый не занят
+        if (client.Phone != dto.Phone)
+        {
+            var phoneExists = await _context.Clients.AnyAsync(c => c.Phone == dto.Phone && c.Id != id && !c.IsDeleted);
+            if (phoneExists)
+            {
+                throw new InvalidOperationException($"Телефон {dto.Phone} уже используется другим клиентом");
+            }
+        }
+
+        if (!string.IsNullOrEmpty(dto.Email) && client.Email != dto.Email)
+        {
+            var emailExists = await _context.Clients.AnyAsync(c => c.Email == dto.Email && c.Id != id && !c.IsDeleted);
+            if (emailExists)
+            {
+                throw new InvalidOperationException($"Email {dto.Email} уже используется другим клиентом");
+            }
+        }
 
         client.LastName = dto.LastName;
         client.FirstName = dto.FirstName;
@@ -110,16 +160,19 @@ public class ClientService : IClientService
         };
     }
 
-    public async Task<bool> DeleteClientAsync(int id)
+    // ✅ ВОЗВРАЩАЕМЫЙ ТИП: Task (без bool)
+    public async Task DeleteClientAsync(int id)
     {
         var client = await _context.Clients.FindAsync(id);
 
+        // ❌ Было: if (client == null || client.IsDeleted == true) return false;
+        // ✅ Стало: бросаем исключение
         if (client == null || client.IsDeleted == true)
-            return false;
+        {
+            throw new KeyNotFoundException($"Клиент с ID {id} не найден");
+        }
 
         client.IsDeleted = true;
         await _context.SaveChangesAsync();
-
-        return true;
     }
 }

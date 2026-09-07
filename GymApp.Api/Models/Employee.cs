@@ -16,7 +16,7 @@ public partial class Employee
 
     public string? Phone { get; set; }
 
-    public bool? IsActive { get; set; }
+    public bool IsActive { get; set; }
 
     public virtual SystemUser? SystemUser { get; set; }
     

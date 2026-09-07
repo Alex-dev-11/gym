@@ -20,7 +20,7 @@ public partial class Client
 
     public DateTime? RegistrationDate { get; set; }
 
-    public bool? IsDeleted { get; set; }
+    public bool IsDeleted { get; set; }
 
     [Column("status", TypeName = "client_status_enum")]
     public string Status { get; set; } = null!;

@@ -117,7 +117,7 @@ public class MembershipService : IMembershipService
         // ═══════════════════════════════════════════════════════════════
         // ШАГ 1: Проверяем существование клиента
         // ═══════════════════════════════════════════════════════════════
-        var clientExists = await _context.Clients.AnyAsync(c => c.Id == dto.ClientId);
+        var clientExists = await _context.Clients.AnyAsync(c => c.Id == dto.ClientId && !c.IsDeleted);
         if (!clientExists)
         {
             throw new KeyNotFoundException($"Клиент с ID {dto.ClientId} не найден");
