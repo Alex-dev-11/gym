@@ -180,7 +180,7 @@ public class VisitService : IVisitService
             MembershipId = membership.Id,
             TrainerId = dto.TrainerId,
             ProcessedByUserId = dto.ProcessedByUserId,
-            VisitTime = DateTime.Now // Текущее время
+            VisitTime =  DateTime.Now //DateTime.Now // Текущее время
         };
 
         _context.Visits.Add(visit);

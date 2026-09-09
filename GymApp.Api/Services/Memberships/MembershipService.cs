@@ -163,6 +163,10 @@ public class MembershipService : IMembershipService
                 throw new InvalidOperationException($"Неизвестный тип абонемента: {dto.Type}");
         }
 
+        //Явно указываем DateTimeKind.Utc для драйвера PostgreSQL
+        var startDateUtc = DateTime.SpecifyKind(dto.StartDate, DateTimeKind.Utc);
+        var endDateUtc = DateTime.SpecifyKind(endDate, DateTimeKind.Utc);
+
         // ═══════════════════════════════════════════════════════════════
         // ШАГ 4: Создаём новый абонемент
         // ═══════════════════════════════════════════════════════════════
@@ -170,8 +174,8 @@ public class MembershipService : IMembershipService
         {
             ClientId = dto.ClientId,
             Type = dto.Type,
-            StartDate = dto.StartDate,
-            EndDate = endDate,
+            StartDate = startDateUtc,  //dto.StartDate
+            EndDate = endDateUtc,       //dto.EndDate
             TotalVisits = totalVisits,
             UsedVisits = 0,
             Status = "active"
