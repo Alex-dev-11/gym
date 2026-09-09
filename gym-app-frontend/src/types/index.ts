@@ -31,9 +31,12 @@ export interface UpdateClientDto {
 }
 
 // ===== АБОНЕМЕНТЫ =====
+// src/types/index.ts
+
 export interface MembershipResponseDto {
   id: number;
   clientId: number;
+  clientFullName: string; // <-- ДОБАВЛЯЕМ ЭТО ПОЛЕ
   type: string; // 'single' | 'month' | 'year'
   startDate: string;
   endDate: string;
@@ -67,4 +70,25 @@ export interface CreateVisitDto {
 export interface ApiError {
   error: string;
   statusCode: number;
+}
+
+
+// --- VISITS TYPES ---
+
+export interface VisitResponseDto {
+  id: number;
+  membershipId: number;
+  clientFullName: string;    // Приходит с бэкенда (JOIN с clients)
+  membershipType: string;    // Приходит с бэкенда ('single', 'month', 'year')
+  trainerName?: string;      // Опционально, если тренер указан
+  visitTime: string;         // ISO-строка даты и времени (DateTime в C#)
+}
+
+export interface CreateVisitDto {
+  membershipId: number;
+  trainerId?: number;        // Опционально
+}
+
+export interface VisitsFilter {
+  membershipId?: number;     // Для фильтрации посещений конкретного абонемента
 }

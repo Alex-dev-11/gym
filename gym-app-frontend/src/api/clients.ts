@@ -1,5 +1,5 @@
 // src/api/clients.ts
-import apiClient from "./client";
+import apiClient from "./apiClient";
 import type {
   ClientResponseDto,
   CreateClientDto,

@@ -1,0 +1,137 @@
+// src/components/memberships/MembershipFormModal.tsx
+import { Modal, Form, Select, DatePicker, message } from 'antd';
+import { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
+import { membershipsApi } from '../../api/memberships';
+import { clientsApi } from '../../api/clients';
+import type { ClientResponseDto, CreateMembershipDto } from '../../types';
+
+interface Props {
+  open: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+}
+
+export function MembershipFormModal({ open, onClose, onSuccess }: Props) {
+  const [form] = Form.useForm();
+  const [submitting, setSubmitting] = useState(false);
+  const [clients, setClients] = useState<ClientResponseDto[]>([]);
+
+  // Загружаем список клиентов только при открытии модалки
+  useEffect(() => {
+    if (open) {
+      clientsApi.getAll().then(response => {
+        // Фильтруем только активных клиентов для удобства (опционально)
+        const activeClients = response.data.filter(c => c.status === 'active' && !c.isDeleted);
+        setClients(activeClients);
+      });
+      form.resetFields();
+    }
+  }, [open, form]);
+
+  const handleSubmit = async () => {
+    try {
+      // 1. Валидация полей формы
+      const values = await form.validateFields();
+      setSubmitting(true);
+
+      // 2. Подготовка данных для бэкенда (дата в формате YYYY-MM-DD)
+      const createData: CreateMembershipDto = {
+        clientId: values.clientId,
+        type: values.type,
+        startDate: values.startDate.format('YYYY-MM-DD'),
+      };
+
+      // 3. Отправка на бэкенд
+      await membershipsApi.create(createData);
+      message.success('Абонемент успешно создан');
+      
+      // 4. Очистка и закрытие
+      form.resetFields();
+      onSuccess(); // Перезагружаем таблицу на странице
+      onClose();
+    } catch (error: any) {
+      // Если это ошибка валидации Ant Design, форма сама подсветит поля
+      if (error.errorFields) {
+        return;
+      }
+      // Ошибки бэкенда (например, "У клиента уже есть активный абонемент") 
+      // уже обработаны interceptor-ом и покажут message.error
+      console.error('Error creating membership:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleCancel = () => {
+    form.resetFields();
+    onClose();
+  };
+
+  return (
+    <Modal
+      title="Новый абонемент"
+      open={open}
+      onOk={handleSubmit}
+      onCancel={handleCancel}
+      confirmLoading={submitting}
+      okText="Создать"
+      cancelText="Отмена"
+      destroyOnHidden
+      width={500}
+    >
+      <Form form={form} layout="vertical" autoComplete="off">
+        <Form.Item
+          label="Клиент"
+          name="clientId"
+          rules={[{ required: true, message: 'Выберите клиента' }]}
+        >
+          <Select
+            placeholder="Выберите клиента"
+            showSearch
+            optionFilterProp="children"
+            filterOption={(input, option) =>
+              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+            }
+            options={clients.map(c => ({
+              value: c.id,
+              label: `${c.lastName} ${c.firstName} (${c.phone})`,
+            }))}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="Тип абонемента"
+          name="type"
+          rules={[{ required: true, message: 'Выберите тип абонемента' }]}
+        >
+          <Select
+            placeholder="Выберите тип"
+            options={[
+              { value: 'single', label: 'Разовое посещение (1 визит, 30 дней)' },
+              { value: 'month', label: 'Месяц (безлимит, 30 дней)' },
+              { value: 'year', label: 'Год (безлимит, 365 дней)' },
+            ]}
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="Дата начала"
+          name="startDate"
+          rules={[{ required: true, message: 'Выберите дату начала' }]}
+          initialValue={dayjs()} // По умолчанию сегодня
+        >
+          <DatePicker 
+            style={{ width: '100%' }}
+            format="YYYY-MM-DD"
+            disabledDate={(current) => current && current < dayjs().startOf('day')} // Нельзя выбрать дату в прошлом
+          />
+        </Form.Item>
+        
+        <div style={{ color: '#888', fontSize: '12px', marginTop: '-10px', marginBottom: '10px' }}>
+          * Бэкенд автоматически рассчитает дату окончания и закроет предыдущий абонемент клиента, если он был активен.
+        </div>
+      </Form>
+    </Modal>
+  );
+}
