@@ -14,24 +14,45 @@ public class ClientService : IClientService
         _context = context;
     }
 
-    public async Task<List<ClientResponseDto>> GetAllClientsAsync()
+    public async Task<List<ClientResponseDto>> GetAllClientsAsync(string? search = null, string? status = null)
     {
-        return await _context.Clients
-            .Where(c => c.IsDeleted == false)
-            .Select(c => new ClientResponseDto
-            {
-                Id = c.Id,
-                LastName = c.LastName,
-                FirstName = c.FirstName,
-                Patronymic = c.Patronymic,
-                Phone = c.Phone,
-                Email = c.Email,
-                RegistrationDate = c.RegistrationDate ?? DateTime.Now,
-                Status = c.Status
-            })
-            .ToListAsync();
-    }
+        // 🚀 МАРКЕР: Если ты видишь эту строку в терминале, значит НОВЫЙ код точно работает!
+        //Console.WriteLine($"[DEBUG] GetAllClientsAsync вызван с параметрами: search='{search}', status='{status}'");
 
+        var query = _context.Clients
+            .Where(c => c.IsDeleted == false)
+            .AsQueryable();
+
+        // 1. Поиск (регистронезависимый благодаря .ToLower())
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var lowerSearch = search.ToLower();
+            query = query.Where(c =>
+                c.LastName.ToLower().Contains(lowerSearch) ||   // Приоритет 1: Фамилия
+                c.Phone.Contains(lowerSearch) ||                // Приоритет 2: Телефон
+                c.FirstName.ToLower().Contains(lowerSearch)     // Приоритет 3: Имя
+            );
+        }
+
+        // 2. Фильтр по статусу
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            query = query.Where(c => c.Status == status);
+        }
+
+        // 3. Выполнение запроса и маппинг
+        return await query.Select(c => new ClientResponseDto
+        {
+            Id = c.Id,
+            LastName = c.LastName,
+            FirstName = c.FirstName,
+            Patronymic = c.Patronymic,
+            Phone = c.Phone,
+            Email = c.Email,
+            RegistrationDate = c.RegistrationDate ?? DateTime.Now,
+            Status = c.Status
+        }).ToListAsync();
+    }
     // ✅ ВОЗВРАЩАЕМЫЙ ТИП: Task<ClientResponseDto> (без ?)
     public async Task<ClientResponseDto> GetClientByIdAsync(int id)
     {

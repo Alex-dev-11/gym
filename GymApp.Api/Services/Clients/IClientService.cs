@@ -4,7 +4,7 @@ namespace GymApp.Api.Services.Clients;
 
 public interface IClientService
 {
-    Task<List<ClientResponseDto>> GetAllClientsAsync();
+    Task<List<ClientResponseDto>> GetAllClientsAsync(string? search = null, string? status = null);
 
     // ❌ Было: Task<ClientResponseDto?> GetClientByIdAsync(int id);
     // ✅ Стало: Task<ClientResponseDto> GetClientByIdAsync(int id);

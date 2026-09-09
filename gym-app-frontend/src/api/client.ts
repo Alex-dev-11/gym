@@ -5,7 +5,7 @@ import type { ApiError } from "../types";
 
 // Создаём инстанс axios с базовыми настройками
 const apiClient = axios.create({
-  baseURL: "http://localhost:5000/api", // URL твоего бэкенда
+  baseURL: "http://localhost:5144/api", // URL твоего бэкенда
   headers: {
     "Content-Type": "application/json",
   },

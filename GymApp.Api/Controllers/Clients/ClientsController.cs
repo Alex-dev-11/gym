@@ -26,9 +26,11 @@ public class ClientsController : ControllerBase
     /// Получить список всех клиентов.
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<List<ClientResponseDto>>> GetAll()
+    public async Task<ActionResult<List<ClientResponseDto>>> GetAll(
+        [FromQuery] string? search = null,
+        [FromQuery] string? status = null)
     {
-        var clients = await _clientService.GetAllClientsAsync();
+        var clients = await _clientService.GetAllClientsAsync(search, status);
         return Ok(clients); // HTTP 200
     }
 

@@ -11,6 +11,16 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") // Порт Vite по умолчанию
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 // 1. Добавляем контроллеры (вместо Minimal API)
 builder.Services.AddControllers();
 
@@ -45,6 +55,8 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthorization();
+
+app.UseCors("AllowFrontend");
 
 // 7. Маппим контроллеры (включаем маршрутизацию)
 app.MapControllers();
