@@ -67,7 +67,9 @@ export function MembershipFormModal({ open, onClose, onSuccess }: Props) {
     form.resetFields();
     onClose();
   };
-
+  const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+  const modalWidth = typeof window !== 'undefined' && window.innerWidth < 768 ? '95%' : 520;
+  const modalStyle: React.CSSProperties = isMobile ? { top: 20 } : {};
   return (
     <Modal
       title="Новый абонемент"
@@ -78,7 +80,8 @@ export function MembershipFormModal({ open, onClose, onSuccess }: Props) {
       okText="Создать"
       cancelText="Отмена"
       destroyOnHidden
-      width={500}
+      width={modalWidth}       // 👈 АДАПТИВНОСТЬ
+      style={modalStyle} 
     >
       <Form form={form} layout="vertical" autoComplete="off">
         <Form.Item

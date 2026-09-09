@@ -1,6 +1,15 @@
 // src/types/index.ts
 
 // ===== КЛИЕНТЫ =====
+export type ClientStatus = 'active' | 'inactive' | 'blacklist'
+
+//ЕДИНЫЙ ИСТОЧНИК ИСТИНЫ: все статусы в одном месте
+export const CLIENT_STATUSES: Record<ClientStatus, { label: string; color: string }> = {
+  active: { label: 'Активный', color: 'success' },
+  inactive: { label: 'Неактивный', color: 'default' },
+  blacklist: { label: 'Черный список', color: 'error' },
+};
+
 export interface ClientResponseDto {
   id: number;
   lastName: string;
@@ -9,7 +18,7 @@ export interface ClientResponseDto {
   phone: string;
   email?: string;
   registrationDate: string; // DateTime приходит как ISO-строка
-  status: string; // 'active' | 'inactive' | 'blacklisted'
+  status: ClientStatus; // 'active' | 'inactive' | 'blacklisted'
   isDeleted: boolean;
 }
 
@@ -27,7 +36,8 @@ export interface UpdateClientDto {
   patronymic?: string;
   phone?: string;
   email?: string;
-  status?: string;
+  status?: ClientStatus;
+  isDeleted?: boolean;
 }
 
 // ===== АБОНЕМЕНТЫ =====

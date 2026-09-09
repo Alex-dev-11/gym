@@ -93,7 +93,9 @@ export const VisitFormModal: React.FC<VisitFormModalProps> = ({
         return type;
     }
   };
-
+  const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+  const modalWidth = typeof window !== 'undefined' && window.innerWidth < 768 ? '95%' : 520;
+  const modalStyle: React.CSSProperties = isMobile ? { top: 20 } : {};
   return (
     <Modal
       title="Регистрация посещения"
@@ -105,8 +107,10 @@ export const VisitFormModal: React.FC<VisitFormModalProps> = ({
         }
       }}
       destroyOnHidden
+      width={modalWidth}       // 👈 АДАПТИВНОСТЬ
+      style={modalStyle}
       footer={null}
-      width={500}
+      
     >
       <Form
         form={form}
