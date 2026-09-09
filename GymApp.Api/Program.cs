@@ -5,6 +5,7 @@ using GymApp.Api.Data;
 using GymApp.Api.Services.Memberships;
 using GymApp.Api.Services.Clients;
 using GymApp.Api.Services.Visits;
+using GymApp.Api.Services.Employees;
 using GymApp.Api.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -37,6 +38,8 @@ builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IMembershipService, MembershipService>();
 
 builder.Services.AddScoped<IVisitService, VisitService>();
+
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 // 5. Подключаем Swagger (для тестирования API)
 builder.Services.AddEndpointsApiExplorer();
