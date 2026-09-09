@@ -28,9 +28,10 @@ public class ClientsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<ClientResponseDto>>> GetAll(
         [FromQuery] string? search = null,
-        [FromQuery] string? status = null)
+        [FromQuery] string? status = null,
+        [FromQuery] bool includeDeleted = false)
     {
-        var clients = await _clientService.GetAllClientsAsync(search, status);
+        var clients = await _clientService.GetAllClientsAsync(search, status, includeDeleted);
         return Ok(clients); // HTTP 200
     }
 

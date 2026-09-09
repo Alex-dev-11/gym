@@ -10,4 +10,5 @@ public class ClientResponseDto
     public string? Email { get; set; }
     public DateTime RegistrationDate { get; set; }
     public string Status { get; set; } = null!;
+    public bool IsDeleted { get; set; }
 }
