@@ -72,23 +72,27 @@ export interface ApiError {
   statusCode: number;
 }
 
-
 // --- VISITS TYPES ---
 
 export interface VisitResponseDto {
   id: number;
   membershipId: number;
-  clientFullName: string;    // Приходит с бэкенда (JOIN с clients)
-  membershipType: string;    // Приходит с бэкенда ('single', 'month', 'year')
-  trainerName?: string;      // Опционально, если тренер указан
-  visitTime: string;         // ISO-строка даты и времени (DateTime в C#)
+  clientFullName: string; // Приходит с бэкенда (JOIN с clients)
+  membershipType: string; // Приходит с бэкенда ('single', 'month', 'year')
+  trainerName?: string; // Опционально, если тренер указан
+  visitTime: string; // ISO-строка даты и времени (DateTime в C#)
 }
 
 export interface CreateVisitDto {
   membershipId: number;
-  trainerId?: number;        // Опционально
+  trainerId?: number; // Опционально
 }
 
 export interface VisitsFilter {
-  membershipId?: number;     // Для фильтрации посещений конкретного абонемента
+  membershipId?: number; // Для фильтрации посещений конкретного абонемента
+}
+
+export interface EmployeeResponseDto {
+  id: number;
+  fullName: string;
 }
