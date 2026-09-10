@@ -7,7 +7,7 @@
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'gym_app_user') THEN
-        CREATE USER gym_app_user WITH PASSWORD '';
+        CREATE USER gym_app_user WITH PASSWORD 'gym_app_user_pass';
         RAISE NOTICE 'Пользователь gym_app_user создан';
     ELSE
         RAISE NOTICE 'Пользователь gym_app_user уже существует';
