@@ -9,7 +9,7 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
   const token = localStorage.getItem('token');
   const userStr = localStorage.getItem('user');
 
-  console.log('ProtectedRoute check:', { token: !!token, user: userStr }); // 👈 Для отладки
+  //console.log('ProtectedRoute check:', { token: !!token, user: userStr }); // 👈 Для отладки
 
   if (!token || !userStr) {
     return <Navigate to="/login" replace />;

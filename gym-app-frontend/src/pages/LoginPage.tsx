@@ -9,12 +9,12 @@ export function LoginPage() {
   const [form] = Form.useForm();
 
   const handleSubmit = async (values: LoginDto) => {
-    console.log('=== КНОПКА НАЖАТА, НАЧИНАЕМ ОТПРАВКУ ===', values);
+    //console.log('=== КНОПКА НАЖАТА, НАЧИНАЕМ ОТПРАВКУ ===', values);
 
     try {
-      console.log('Отправляем запрос на бэкенд...');
+      //console.log('Отправляем запрос на бэкенд...');
       const response = await authApi.login(values);
-      console.log('Успешный ответ от бэкенда:', response);
+      //console.log('Успешный ответ от бэкенда:', response);
       
       localStorage.setItem('token', response.token);
       localStorage.setItem('user', JSON.stringify({
@@ -27,7 +27,7 @@ export function LoginPage() {
       navigate('/clients', { replace: true });
       
     } catch (error: any) {
-      console.error('=== ПОЙМАНА ОШИБКА В COMPONENTE ===', error);
+      //console.error('=== ПОЙМАНА ОШИБКА В COMPONENTE ===', error);
       
       // Если ошибка не была показана интерсептором, показываем её здесь
       if (error.response?.status !== 401) {
