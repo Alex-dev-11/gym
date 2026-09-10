@@ -13,6 +13,7 @@ using System.Text;
 using GymApp.Api.Services.Auth;
 using GymApp.Api.Services.Users;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
@@ -75,7 +76,7 @@ builder.Services.AddAuthentication(options =>
 // Регистрация сервисов
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
-
+//builder.Services.AddScoped<IValidator<CreateEmployeeDto>, CreateEmployeeDtoValidator>();
 
 
 

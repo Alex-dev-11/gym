@@ -77,7 +77,7 @@ export function EmployeeFormModal({ open, employee, onClose, onSuccess }: Props)
         <Form.Item name="patronymic" label="Отчество">
           <Input placeholder="Иванович" />
         </Form.Item>
-        <Form.Item name="phone" label="Телефон" rules={[{ required: true }]}>
+        <Form.Item name="phone" label="Телефон">
           <Input placeholder="+7 (999) 123-45-67" />
         </Form.Item>
         <Form.Item name="position" label="Должность" rules={[{ required: true }]}>

@@ -175,7 +175,7 @@ export interface EmployeeResponseDto {
   lastName: string;
   firstName: string;
   patronymic?: string;
-  phone: string;
+  phone?: string;
   position: EmployeePosition;
   isActive: boolean;
 }
@@ -184,7 +184,7 @@ export interface CreateEmployeeDto {
   lastName: string;
   firstName: string;
   patronymic?: string;
-  phone: string;
+  phone?: string;
   position: EmployeePosition;
 }
 

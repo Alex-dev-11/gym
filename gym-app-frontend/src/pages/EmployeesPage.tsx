@@ -76,7 +76,12 @@ export function EmployeesPage() {
         </div>
       ),
     },
-    { title: 'Телефон', dataIndex: 'phone', key: 'phone' },
+    { 
+      title: 'Телефон', 
+      dataIndex: 'phone', 
+      key: 'phone',
+      render: (text: string) => text || '—', // 👈 Показываем "—", если телефон не указан
+    },
     {
       title: 'Должность',
       dataIndex: 'position',
