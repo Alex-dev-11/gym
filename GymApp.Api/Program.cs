@@ -77,7 +77,12 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 
+
+
 var app = builder.Build();
+
+app.UseAuthentication(); // 👈 Добавили ДО UseAuthorization
+app.UseAuthorization();
 
 // 6. Настраиваем конвейер запросов (middleware)
 if (app.Environment.IsDevelopment())
