@@ -101,4 +101,12 @@ app.UseCors("AllowFrontend");
 // 7. Маппим контроллеры (включаем маршрутизацию)
 app.MapControllers();
 
+// ВРЕМЕННЫЙ КОД ДЛЯ ГЕНЕРАЦИИ ХЭША
+var testPassword = "123456";
+var hash = BCrypt.Net.BCrypt.HashPassword(testPassword);
+Console.WriteLine($"========================================");
+Console.WriteLine($"ХЭШ ДЛЯ ПАРОЛЯ '123456': {hash}");
+Console.WriteLine($"========================================");
+
+
 app.Run();

@@ -122,3 +122,72 @@ export interface EmployeeResponseDto {
   id: number;
   fullName: string;
 }
+
+// ============ АВТОРИЗАЦИЯ ============
+export interface LoginDto {
+  login: string;
+  password: string;
+}
+
+export interface LoginResponseDto {
+  token: string;
+  login: string;
+  role: string;
+  fullName: string;
+}
+
+// ============ ПОЛЬЗОВАТЕЛИ ============
+export interface UserResponseDto {
+  id: number;
+  login: string;
+  role: string;
+  fullName: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface CreateUserDto {
+  login: string;
+  password: string;
+  role: string;
+  employeeId?: number;
+}
+
+// ============ РОЛИ ПОЛЬЗОВАТЕЛЕЙ ============
+export type UserRole = "admin" | "operator";
+
+export const USER_ROLES: Record<UserRole, { label: string; color: string }> = {
+  admin: { label: "Администратор", color: "red" },
+  operator: { label: "Оператор", color: "blue" },
+};
+
+// 
+
+export type EmployeePosition = "administrator" | "trainer";
+
+export const EMPLOYEE_POSITIONS: Record<EmployeePosition, { label: string }> = {
+  administrator: { label: "Администратор" },
+  trainer: { label: "Тренер" },
+};
+
+export interface EmployeeResponseDto {
+  id: number;
+  lastName: string;
+  firstName: string;
+  patronymic?: string;
+  phone: string;
+  position: EmployeePosition;
+  isActive: boolean;
+}
+
+export interface CreateEmployeeDto {
+  lastName: string;
+  firstName: string;
+  patronymic?: string;
+  phone: string;
+  position: EmployeePosition;
+}
+
+export interface UpdateEmployeeDto extends Partial<CreateEmployeeDto> {
+  isActive?: boolean;
+}

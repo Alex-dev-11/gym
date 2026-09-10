@@ -1,39 +1,40 @@
-// src/api/client.ts
-import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
+import axios from "axios";
 import { message } from "antd";
-import type { ApiError } from "../types";
 
-// Создаём инстанс axios с базовыми настройками
 const apiClient = axios.create({
-  baseURL: "http://localhost:5144/api", // URL твоего бэкенда
+  baseURL: "http://localhost:5144/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// Перехватчик запросов (место для токена авторизации в будущем)
-apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    // Пока без токенов, но место зарезервировано
-    return config;
-  },
-  (error: unknown): Promise<never> => {
-    return Promise.reject(error);
-  },
-);
+// Добавляем токен к каждому запросу
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
-// Перехватчик ответов для централизованной обработки ошибок
+// Обрабатываем ответы и ошибки
 apiClient.interceptors.response.use(
   (response) => {
-    return response; // TypeScript сам выведет тип из контекста
+    return response;
   },
-  (error: AxiosError<ApiError>): Promise<never> => {
-    // Если бэкенд вернул нашу стандартизированную ошибку из Middleware
-    if (error.response?.data?.error) {
-      message.error(error.response.data.error);
-    } else {
-      // Иначе показываем общую ошибку сети или сервера
-      message.error("Произошла ошибка сети или сервер недоступен");
+  (error) => {
+    // Если токен протух или неверен (401)
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      // 👇 ВАЖНО: Перенаправляем на логин ТОЛЬКО если мы там еще не находимся
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      } else {
+        // Если мы уже на логине, просто показываем ошибку и даем компоненту обработать её
+        message.error("Неверный логин или пароль");
+      }
     }
 
     return Promise.reject(error);

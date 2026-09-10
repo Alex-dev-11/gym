@@ -21,6 +21,7 @@ import type {
   MembershipType,
 } from "../types";
 import { MEMBERSHIP_TYPES } from "../types";
+import { tablePagination } from "../utils/tableConfig";
 
 const { Title } = Typography;
 
@@ -155,11 +156,7 @@ export const VisitsPage: React.FC = () => {
         rowKey="id"
         loading={loading}
         scroll={{ x: 'max-content' }}
-        pagination={{
-          pageSize: 20,
-          showSizeChanger: true,
-          showTotal: (total) => `Всего посещений: ${total}`,
-        }}
+        pagination={tablePagination}
         locale={{
           emptyText: "Посещения не найдены",
         }}

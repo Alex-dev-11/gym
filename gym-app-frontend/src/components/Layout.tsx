@@ -5,7 +5,10 @@ import {
   UserOutlined, 
   CreditCardOutlined, 
   CalendarOutlined,
-  MenuOutlined 
+  MenuOutlined,
+  SettingOutlined,
+  LogoutOutlined,
+  TeamOutlined
 } from '@ant-design/icons';
 
 const { Header, Sider, Content } = AntLayout;
@@ -27,10 +30,24 @@ export function Layout() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const userStr = localStorage.getItem('user');
+  const userFullName = userStr ? JSON.parse(userStr).fullName : 'Пользователь';
+  const userRole = userStr ? JSON.parse(userStr).role : null;
+  
+  const handleLogout = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  window.location.href = '/login'; // Жёсткий редирект, гарантированно сбрасывает состояние
+  };
+
   const menuItems = [
     { key: '/clients', icon: <UserOutlined />, label: 'Клиенты' },
     { key: '/memberships', icon: <CreditCardOutlined />, label: 'Абонементы' },
     { key: '/visits', icon: <CalendarOutlined />, label: 'Посещения' },
+    ...(userRole === 'admin' ? [
+    { key: '/employees', icon: <TeamOutlined />, label: 'Сотрудники' },
+    { key: '/users', icon: <SettingOutlined />, label: 'Пользователи' }
+  ] : []),
   ];
 
   return (
@@ -107,9 +124,21 @@ export function Layout() {
               Система управления залом
             </div>
           </div>
-          <div style={{ color: '#666', fontSize: 14 }} className="hidden sm:block">
-            Оператор: Администратор
-          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <span className="hidden sm:inline text-gray-600 text-sm font-medium">
+            {userFullName}
+          </span>
+          <Button 
+            type="default" 
+            danger 
+            ghost 
+            icon={<LogoutOutlined />} 
+            onClick={handleLogout}
+            title="Выйти из системы"
+          >
+            <span className="hidden sm:inline">Выйти</span>
+          </Button>
+        </div>
         </Header>
 
         <Content style={{ 

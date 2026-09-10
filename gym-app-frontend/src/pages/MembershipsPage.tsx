@@ -6,6 +6,7 @@ import { clientsApi } from '../api/clients';
 import { MembershipFormModal } from '../components/memberships/MembershipFormModal';
 import type { MembershipResponseDto, ClientResponseDto, MembershipStatus, MembershipType } from '../types';
 import { MEMBERSHIP_TYPES, MEMBERSHIP_STATUSES } from '../types';
+import { tablePagination } from '../utils/tableConfig';
 
 const { Title } = Typography;
 
@@ -134,7 +135,7 @@ export function MembershipsPage() {
         rowKey="id"
         loading={loading}
         scroll={{ x: 'max-content' }}
-        pagination={{ pageSize: 10 }}
+        pagination={tablePagination}
       />
 
       <MembershipFormModal

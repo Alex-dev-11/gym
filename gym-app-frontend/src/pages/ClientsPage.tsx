@@ -5,6 +5,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, UndoOutline
 import { useClients } from '../hooks/useClients';
 import { clientsApi } from '../api/clients';
 import { ClientFormModal } from '../components/clients/ClientFormModal';
+import { tablePagination } from '../utils/tableConfig';
 
 const { Title } = Typography;
 const { Search } = Input;
@@ -154,7 +155,7 @@ export function ClientsPage() {
         rowKey="id"
         loading={loading}
         scroll={{ x: 'max-content' }}
-        pagination={{ pageSize: 10, showSizeChanger: true }}
+        pagination={tablePagination}
       />
 
       <ClientFormModal
