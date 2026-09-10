@@ -12,6 +12,7 @@ services:
       - "5432:5432"
     volumes:
     # Магическая папка: всё, что здесь лежит, PostgreSQL выполнит при первом запуске
+      - ./db_sql_scripts/00_db_create.sql:/docker-entrypoint-initdb.d/00_db_create.sql
       - ./db_sql_scripts/01_db_structure.sql:/docker-entrypoint-initdb.d/01_db_structure.sql
       - ./db_sql_scripts/02_seed_data.sql:/docker-entrypoint-initdb.d/02_seed_data.sql
       - gym_pgdata:/var/lib/postgresql/data
