@@ -1,6 +1,7 @@
 using GymApp.Api.DTOs.Clients;
 using GymApp.Api.Services.Clients;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GymApp.Api.Controllers.Clients;
 
@@ -12,6 +13,7 @@ namespace GymApp.Api.Controllers.Clients;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ClientsController : ControllerBase
 {
     private readonly IClientService _clientService;

@@ -1,6 +1,7 @@
 using GymApp.Api.DTOs.Memberships;
 using GymApp.Api.Services.Memberships;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GymApp.Api.Controllers.Memberships;
 
@@ -12,6 +13,7 @@ namespace GymApp.Api.Controllers.Memberships;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class MembershipsController : ControllerBase
 {
     private readonly IMembershipService _membershipService;

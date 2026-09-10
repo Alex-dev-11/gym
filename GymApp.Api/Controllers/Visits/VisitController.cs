@@ -1,6 +1,7 @@
 using GymApp.Api.DTOs.Visits;
 using GymApp.Api.Services.Visits;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GymApp.Api.Controllers;
 
@@ -12,6 +13,7 @@ namespace GymApp.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class VisitsController : ControllerBase
 {
     private readonly IVisitService _visitService;
