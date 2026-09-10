@@ -93,10 +93,10 @@
 ├── GymApp.slnx
 ├── README.md
 ├── db_sql_scripts
-│   ├── db_structure.sql
-│   ├── gym_app_user.txt
-│   ├── seed_data.sql
-│   └── users.sql
+│   ├── 00_db_create.sql
+│   ├── 01_db_structure.sql
+│   ├── 02_seed_data.sql
+│   └── gym_app_user.txt
 ├── docker-compose.yml
 ├── gym-app-frontend
 │   ├── .gitignore

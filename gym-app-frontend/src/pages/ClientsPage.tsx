@@ -22,9 +22,10 @@ export function ClientsPage() {
       title: 'Клиент',
       key: 'clientName',
       render: (_: unknown, record: ClientResponseDto) => (
-        <div>
-          <div className="font-medium">{record.lastName} {record.firstName}</div>
-          <div className="text-xs text-gray-500 md:hidden">{record.phone}</div>
+        <div className="font-medium">
+          {[record.lastName, record.firstName, record.patronymic]
+            .filter(Boolean)
+            .join(' ')}
         </div>
       )
     },
@@ -33,13 +34,6 @@ export function ClientsPage() {
       dataIndex: 'phone',
       key: 'phone',
       className: 'hidden md:table-cell',
-    },
-    {
-      title: 'Отчество',
-      dataIndex: 'patronymic',
-      key: 'patronymic',
-      render: (text: string) => text || '—',
-      className: 'hidden lg:table-cell',
     },
     {
       title: 'Email',

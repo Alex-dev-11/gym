@@ -6,7 +6,6 @@ import {
   Typography,
   Select,
   Tag,
-  Card,
   message,
 } from "antd";
 import { PlusOutlined, ReloadOutlined } from "@ant-design/icons";
@@ -130,25 +129,22 @@ export const VisitsPage: React.FC = () => {
         </Space>
       </div>
 
-      <Card className="mb-4">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <span style={{ fontWeight: 500, whiteSpace: 'nowrap' }}>Фильтр по абонементу:</span>
-          <Select
-            placeholder="Все абонементы"
-            allowClear
-            showSearch
-            optionFilterProp="label"
-            loading={membershipsLoading}
-            style={{ width: window.innerWidth < 768 ? '100%' : 300 }} // 👈 Прямая ширина
-            value={filter.membershipId}
-            onChange={handleMembershipFilterChange}
-            options={allMemberships.map((m) => ({
-              value: m.id,
-              label: `${m.clientFullName} — ${MEMBERSHIP_TYPES[m.type as MembershipType]?.shortLabel || m.type}`,
-            }))}
-          />
-        </div>
-      </Card>
+      <Space className="flex flex-wrap w-full mb-4" size="middle">
+        <Select
+          placeholder="Фильтр по абонементу"
+          allowClear
+          showSearch
+          optionFilterProp="label"
+          loading={membershipsLoading}
+          style={{ width: window.innerWidth < 768 ? '100%' : 300 }}
+          value={filter.membershipId}
+          onChange={handleMembershipFilterChange}
+          options={allMemberships.map((m) => ({
+            value: m.id,
+            label: `${m.clientFullName} — ${MEMBERSHIP_TYPES[m.type as MembershipType]?.shortLabel || m.type}`,
+          }))}
+        />
+      </Space>
 
       <Table<VisitResponseDto>
         columns={columns}

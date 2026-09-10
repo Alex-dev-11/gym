@@ -129,8 +129,8 @@ export function EmployeesPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <Title level={2} className="mb-0">Сотрудники зала</Title>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <Title level={2} style={{ margin: 0 }}>Сотрудники зала</Title>
         <Button 
           type="primary" 
           icon={<PlusOutlined />} 

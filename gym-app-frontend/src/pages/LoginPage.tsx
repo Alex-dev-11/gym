@@ -59,7 +59,7 @@ export function LoginPage() {
           >
             <Input
               prefix={<UserOutlined />}
-              placeholder="Логин (например: admin_linked)"
+              placeholder="Логин"
               size="large"
             />
           </Form.Item>
@@ -70,7 +70,7 @@ export function LoginPage() {
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Пароль (например: 123456)"
+              placeholder="Пароль"
               size="large"
             />
           </Form.Item>

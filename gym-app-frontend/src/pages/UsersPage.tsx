@@ -28,14 +28,19 @@ export function UsersPage() {
       title: 'Логин',
       dataIndex: 'login',
       key: 'login',
-      render: (login: string, record: UserResponseDto) => (
-        <div>
-          <div className="font-medium">{login}</div>
-          {record.fullName !== login && (
-            <div className="text-xs text-gray-500">{record.fullName}</div>
-          )}
-        </div>
-      ),
+      width: 150,
+    },
+    {
+      title: 'ФИО сотрудника',
+      dataIndex: 'fullName',
+      key: 'fullName',
+      render: (fullName: string, record: UserResponseDto) => {
+        // Если fullName совпадает с login, значит сотрудник не привязан
+        if (fullName === record.login) {
+          return <span className="text-gray-400">—</span>;
+        }
+        return <span className="font-medium">{fullName}</span>;
+      },
     },
     {
       title: 'Роль',
@@ -82,9 +87,13 @@ export function UsersPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <Title level={2} className="mb-0">Пользователи системы</Title>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => setModalOpen(true)}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <Title level={2} style={{ margin: 0 }}>Пользователи системы</Title>
+        <Button 
+          type="primary" 
+          icon={<PlusOutlined />} 
+          onClick={() => setModalOpen(true)}
+        >
           Добавить пользователя
         </Button>
       </div>
