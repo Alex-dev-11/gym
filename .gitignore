@@ -4,7 +4,7 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
 GymApp.Api/appsettings.json
-db_sql_scripts/gym_app_user.txt
+
 
 # User-specific files
 *.rsuser
