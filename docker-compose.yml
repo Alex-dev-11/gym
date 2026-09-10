@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: gym_db
+    restart: always
+    environment:
+      POSTGRES_USER: gym_app_user
+      POSTGRES_PASSWORD: 14uii-h
+      POSTGRES_DB: gym_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - gym_pgdata:/var/lib/postgresql/data
+
+volumes:
+  gym_pgdata:
