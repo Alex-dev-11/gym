@@ -53,7 +53,7 @@ INSERT INTO clients (last_name, first_name, patronymic, phone, email, status, is
 ('Смирнова', 'Анна', 'Петровна', '+79222222222', 'smirnova@gmail.com', 'active', false, CURRENT_DATE - INTERVAL '60 days'),
 ('Попов', 'Сергей', 'Александрович', '+79333333333', 'popov@yandex.ru', 'inactive', false, CURRENT_DATE - INTERVAL '180 days'),
 ('Васильева', 'Ольга', 'Дмитриевна', '+79444444444', 'vasilieva@mail.ru', 'active', false, CURRENT_DATE - INTERVAL '30 days'),
-('Федоров', 'Алексей', 'Николаевич', '+79555555555', 'fedorov@gmail.com', 'blacklist', false, CURRENT_DATE - INTERVAL '365 days'),
+('Федоров', 'Алексей', 'Николаевич', '+79555555555', 'fedorov@gmail.com', 'blacklisted', false, CURRENT_DATE - INTERVAL '365 days'),
 ('Николаева', 'Екатерина', 'Сергеевна', '+79666666666', 'nikolaeva@yandex.ru', 'active', false, CURRENT_DATE - INTERVAL '15 days'),
 ('Михайлов', 'Андрей', 'Владимирович', '+79777777777', 'mikhailov@mail.ru', 'inactive', true, CURRENT_DATE - INTERVAL '400 days')
 ON CONFLICT (phone) DO NOTHING;
