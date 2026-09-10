@@ -1,3 +1,16 @@
+<p align="center">
+  <img src="https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white" alt=".NET 10">
+  <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React 19">
+  <img src="https://img.shields.io/badge/TypeScript-5+-3178C6?logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/PostgreSQL-15-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white" alt="Docker">
+</p>
+
+<p align="center">
+  <strong>Полнофункциональная система управления спортивным залом с ролевой моделью доступа, автоматизацией абонементов и адаптивным UI.</strong>
+</p>
+
+---
 # 🏋️ Gym Management System
 
 Полнофункциональная система управления спортивным залом. Предназначена для учета клиентов, управления абонементами, регистрации посещений и разграничения прав доступа персонала.
