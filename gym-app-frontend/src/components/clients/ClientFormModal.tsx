@@ -1,9 +1,8 @@
-// src/components/clients/ClientFormModal.tsx
 import { Modal, Form, Input, message, Select, Alert } from 'antd';
 import { useEffect, useState } from 'react';
 import { clientsApi } from '../../api/clients';
 import type { ClientResponseDto, CreateClientDto, UpdateClientDto } from '../../types';
-import { CLIENT_STATUSES } from '../../types'; // 👈 Импортируем конфиг
+import { CLIENT_STATUSES } from '../../types';
 
 interface Props {
   open: boolean;
@@ -18,6 +17,8 @@ export function ClientFormModal({ open, editingClient, onClose, onSuccess }: Pro
   
   const isEditMode = !!editingClient;
   const isDeleted = editingClient?.isDeleted;
+
+  const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
   useEffect(() => {
     if (open) {
@@ -68,11 +69,7 @@ export function ClientFormModal({ open, editingClient, onClose, onSuccess }: Pro
     form.resetFields();
     onClose();
   };
-// 👈 АДАПТИВНОСТЬ: динамическая ширина модалки
-  const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
-  const modalWidth = typeof window !== 'undefined' && window.innerWidth < 768 ? '95%' : 520;
-  const modalStyle: React.CSSProperties = isMobile ? { top: 20 } : {};
-  
+
   return (
     <Modal
       title={isEditMode ? 'Редактировать клиента' : 'Новый клиент'}
@@ -83,8 +80,8 @@ export function ClientFormModal({ open, editingClient, onClose, onSuccess }: Pro
       okText="Сохранить"
       cancelText="Отмена"
       destroyOnHidden
-      width={modalWidth}       // 👈 АДАПТИВНОСТЬ
-      style={modalStyle} 
+      width={isMobile ? '95%' : 520}
+      style={isMobile ? { top: 20 } : undefined}
     >
       {isDeleted && (
         <Alert
@@ -151,7 +148,6 @@ export function ClientFormModal({ open, editingClient, onClose, onSuccess }: Pro
             rules={[{ required: true, message: 'Выберите статус' }]}
           >
             <Select placeholder="Выберите статус">
-              {/* 👇 Автоматическая генерация опций из конфига */}
               {Object.entries(CLIENT_STATUSES).map(([value, { label }]) => (
                 <Select.Option key={value} value={value}>
                   {label}

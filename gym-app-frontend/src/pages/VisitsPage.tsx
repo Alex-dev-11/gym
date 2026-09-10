@@ -1,4 +1,3 @@
-// src/pages/VisitsPage.tsx
 import { useState, useEffect, useMemo } from "react";
 import {
   Table,
@@ -19,24 +18,20 @@ import type {
   VisitResponseDto,
   MembershipResponseDto,
   VisitsFilter,
+  MembershipType,
 } from "../types";
+import { MEMBERSHIP_TYPES } from "../types";
 
 const { Title } = Typography;
 
 export const VisitsPage: React.FC = () => {
-  // Хук для управления посещениями
   const { visits, loading, reload, filter, updateFilter } = useVisits();
 
-  // Состояние модалки
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Список всех абонементов для фильтра
-  const [allMemberships, setAllMemberships] = useState<MembershipResponseDto[]>(
-    []
-  );
+  const [allMemberships, setAllMemberships] = useState<MembershipResponseDto[]>([]);
   const [membershipsLoading, setMembershipsLoading] = useState(false);
 
-  // Загружаем абонементы для фильтра при монтировании страницы
   useEffect(() => {
     const loadMemberships = async () => {
       setMembershipsLoading(true);
@@ -56,7 +51,6 @@ export const VisitsPage: React.FC = () => {
     loadMemberships();
   }, []);
 
-  // Колонки таблицы
   const columns: ColumnsType<VisitResponseDto> = useMemo(
     () => [
       {
@@ -86,22 +80,10 @@ export const VisitsPage: React.FC = () => {
         dataIndex: "membershipType",
         key: "membershipType",
         width: 150,
-        render: (type: string) => {
-          const colorMap: Record<string, string> = {
-            single: "blue",
-            month: "green",
-            year: "gold",
-          };
-          const labelMap: Record<string, string> = {
-            single: "Разовый",
-            month: "Месяц",
-            year: "Год",
-          };
-          return (
-            <Tag color={colorMap[type] ?? "default"}>
-              {labelMap[type] ?? type}
-            </Tag>
-          );
+        render: (type: MembershipType) => {
+          const config = MEMBERSHIP_TYPES[type];
+          if (!config) return <Tag>{type}</Tag>;
+          return <Tag color={config.color}>{config.tableLabel}</Tag>;
         },
       },
       {
@@ -115,33 +97,22 @@ export const VisitsPage: React.FC = () => {
     []
   );
 
-  // Обработчик изменения фильтра по абонементу
   const handleMembershipFilterChange = (membershipId: number | undefined) => {
-    const newFilter: VisitsFilter = membershipId
-      ? { membershipId }
-      : {};
+    const newFilter: VisitsFilter = membershipId ? { membershipId } : {};
     updateFilter(newFilter);
   };
 
-  // Обработчик успешного создания посещения
   const handleVisitCreated = () => {
-    reload(); // Перезагружаем таблицу
+    reload();
   };
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <Title level={2} className="mb-0">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <Title level={2} style={{ margin: 0 }}>
           Посещения
         </Title>
         <Space>
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={reload}
-            loading={loading}
-          >
-            Обновить
-          </Button>
           <Button
             type="primary"
             icon={<PlusOutlined />}
@@ -149,27 +120,33 @@ export const VisitsPage: React.FC = () => {
           >
             Зарегистрировать посещение
           </Button>
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={reload}
+            loading={loading}
+            title="Обновить"
+          />
         </Space>
       </div>
 
       <Card className="mb-4">
-        <Space wrap>
-          <span className="font-medium">Фильтр по абонементу:</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: 500, whiteSpace: 'nowrap' }}>Фильтр по абонементу:</span>
           <Select
             placeholder="Все абонементы"
             allowClear
             showSearch
             optionFilterProp="label"
             loading={membershipsLoading}
-            style={{ minWidth: 300 }}
+            style={{ width: window.innerWidth < 768 ? '100%' : 300 }} // 👈 Прямая ширина
             value={filter.membershipId}
             onChange={handleMembershipFilterChange}
             options={allMemberships.map((m) => ({
               value: m.id,
-              label: `${m.clientFullName} — ${m.type} (ID: ${m.id})`,
+              label: `${m.clientFullName} — ${MEMBERSHIP_TYPES[m.type as MembershipType]?.shortLabel || m.type}`,
             }))}
           />
-        </Space>
+        </div>
       </Card>
 
       <Table<VisitResponseDto>
@@ -177,6 +154,7 @@ export const VisitsPage: React.FC = () => {
         dataSource={visits}
         rowKey="id"
         loading={loading}
+        scroll={{ x: 'max-content' }}
         pagination={{
           pageSize: 20,
           showSizeChanger: true,

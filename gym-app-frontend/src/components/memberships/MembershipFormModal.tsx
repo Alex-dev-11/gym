@@ -1,10 +1,10 @@
-// src/components/memberships/MembershipFormModal.tsx
 import { Modal, Form, Select, DatePicker, message } from 'antd';
 import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { membershipsApi } from '../../api/memberships';
 import { clientsApi } from '../../api/clients';
 import type { ClientResponseDto, CreateMembershipDto } from '../../types';
+import { MEMBERSHIP_TYPES } from '../../types';
 
 interface Props {
   open: boolean;
@@ -17,11 +17,11 @@ export function MembershipFormModal({ open, onClose, onSuccess }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [clients, setClients] = useState<ClientResponseDto[]>([]);
 
-  // Загружаем список клиентов только при открытии модалки
+  const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+
   useEffect(() => {
     if (open) {
       clientsApi.getAll().then(response => {
-        // Фильтруем только активных клиентов для удобства (опционально)
         const activeClients = response.data.filter(c => c.status === 'active' && !c.isDeleted);
         setClients(activeClients);
       });
@@ -31,32 +31,25 @@ export function MembershipFormModal({ open, onClose, onSuccess }: Props) {
 
   const handleSubmit = async () => {
     try {
-      // 1. Валидация полей формы
       const values = await form.validateFields();
       setSubmitting(true);
 
-      // 2. Подготовка данных для бэкенда (дата в формате YYYY-MM-DD)
       const createData: CreateMembershipDto = {
         clientId: values.clientId,
         type: values.type,
         startDate: values.startDate.format('YYYY-MM-DD'),
       };
 
-      // 3. Отправка на бэкенд
       await membershipsApi.create(createData);
       message.success('Абонемент успешно создан');
       
-      // 4. Очистка и закрытие
       form.resetFields();
-      onSuccess(); // Перезагружаем таблицу на странице
+      onSuccess();
       onClose();
     } catch (error: any) {
-      // Если это ошибка валидации Ant Design, форма сама подсветит поля
       if (error.errorFields) {
         return;
       }
-      // Ошибки бэкенда (например, "У клиента уже есть активный абонемент") 
-      // уже обработаны interceptor-ом и покажут message.error
       console.error('Error creating membership:', error);
     } finally {
       setSubmitting(false);
@@ -67,9 +60,7 @@ export function MembershipFormModal({ open, onClose, onSuccess }: Props) {
     form.resetFields();
     onClose();
   };
-  const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
-  const modalWidth = typeof window !== 'undefined' && window.innerWidth < 768 ? '95%' : 520;
-  const modalStyle: React.CSSProperties = isMobile ? { top: 20 } : {};
+
   return (
     <Modal
       title="Новый абонемент"
@@ -80,8 +71,8 @@ export function MembershipFormModal({ open, onClose, onSuccess }: Props) {
       okText="Создать"
       cancelText="Отмена"
       destroyOnHidden
-      width={modalWidth}       // 👈 АДАПТИВНОСТЬ
-      style={modalStyle} 
+      width={isMobile ? '95%' : 500}
+      style={isMobile ? { top: 20 } : undefined}
     >
       <Form form={form} layout="vertical" autoComplete="off">
         <Form.Item
@@ -92,7 +83,7 @@ export function MembershipFormModal({ open, onClose, onSuccess }: Props) {
           <Select
             placeholder="Выберите клиента"
             showSearch
-            optionFilterProp="children"
+            optionFilterProp="label"
             filterOption={(input, option) =>
               (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
             }
@@ -108,26 +99,25 @@ export function MembershipFormModal({ open, onClose, onSuccess }: Props) {
           name="type"
           rules={[{ required: true, message: 'Выберите тип абонемента' }]}
         >
-          <Select
-            placeholder="Выберите тип"
-            options={[
-              { value: 'single', label: 'Разовое посещение (1 визит, 30 дней)' },
-              { value: 'month', label: 'Месяц (безлимит, 30 дней)' },
-              { value: 'year', label: 'Год (безлимит, 365 дней)' },
-            ]}
-          />
+          <Select placeholder="Выберите тип">
+            {Object.entries(MEMBERSHIP_TYPES).map(([value, { label }]) => (
+              <Select.Option key={value} value={value}>
+                {label}
+              </Select.Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item
           label="Дата начала"
           name="startDate"
           rules={[{ required: true, message: 'Выберите дату начала' }]}
-          initialValue={dayjs()} // По умолчанию сегодня
+          initialValue={dayjs()}
         >
           <DatePicker 
             style={{ width: '100%' }}
             format="YYYY-MM-DD"
-            disabledDate={(current) => current && current < dayjs().startOf('day')} // Нельзя выбрать дату в прошлом
+            disabledDate={(current) => current && current < dayjs().startOf('day')}
           />
         </Form.Item>
         

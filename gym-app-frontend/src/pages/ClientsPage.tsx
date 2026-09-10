@@ -23,7 +23,6 @@ export function ClientsPage() {
       render: (_: unknown, record: ClientResponseDto) => (
         <div>
           <div className="font-medium">{record.lastName} {record.firstName}</div>
-          {/* 👈 АДАПТИВНОСТЬ: на мобильном телефон показываем сразу под именем */}
           <div className="text-xs text-gray-500 md:hidden">{record.phone}</div>
         </div>
       )
@@ -32,14 +31,14 @@ export function ClientsPage() {
       title: 'Телефон',
       dataIndex: 'phone',
       key: 'phone',
-      className: 'hidden md:table-cell', // 👈 АДАПТИВНОСТЬ: скрыт на мобильном
+      className: 'hidden md:table-cell',
     },
     {
       title: 'Отчество',
       dataIndex: 'patronymic',
       key: 'patronymic',
       render: (text: string) => text || '—',
-      className: 'hidden lg:table-cell', // 👈 АДАПТИВНОСТЬ: скрыт на мобильном и планшете
+      className: 'hidden lg:table-cell',
     },
     {
       title: 'Email',
@@ -100,7 +99,7 @@ export function ClientsPage() {
       await clientsApi.delete(id);
       message.success('Клиент удалён');
       reload();
-    } catch (err) {
+    } catch {
       message.error('Ошибка при удалении');
     }
   };
@@ -110,17 +109,21 @@ export function ClientsPage() {
       await clientsApi.update(client.id, { isDeleted: false, status: 'active' });
       message.success('Клиент восстановлен');
       reload();
-    } catch (err) {
+    } catch {
       message.error('Ошибка при восстановлении');
     }
   };
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-        <Title level={2} className="mb-0">Клиенты</Title>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => { setEditingClient(null); setModalOpen(true); }}>
-          Добавить
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <Title level={2} style={{ margin: 0 }}>Клиенты</Title>
+        <Button 
+          type="primary" 
+          icon={<PlusOutlined />}
+          onClick={() => { setEditingClient(null); setModalOpen(true); }}
+        >
+          Добавить клиента
         </Button>
       </div>
 
@@ -129,15 +132,14 @@ export function ClientsPage() {
           placeholder="Поиск по имени или телефону"
           allowClear
           enterButton={<SearchOutlined />}
-          className="w-full sm:w-[300px]" // 👈 АДАПТИВНОСТЬ: полная ширина на мобильном
+          className="w-full sm:w-[300px]"
           onSearch={handleSearch}
         />
         <Select
           placeholder="Фильтр по статусу"
           allowClear
-          className="w-full sm:w-[200px]" // 👈 АДАПТИВНОСТЬ: полная ширина на мобильном
+          className="w-full sm:w-[200px]"
           onChange={handleStatusChange}
-          // 👈 ИСПРАВЛЕНО: ключи должны совпадать с CLIENT_STATUSES ('blacklist', а не 'blacklisted')
           options={[
             { value: 'active', label: 'Активен' },
             { value: 'inactive', label: 'Неактивен' },
@@ -151,7 +153,7 @@ export function ClientsPage() {
         dataSource={clients}
         rowKey="id"
         loading={loading}
-        scroll={{ x: 'max-content' }} // 👈 АДАПТИВНОСТЬ: критически важно для мобильных!
+        scroll={{ x: 'max-content' }}
         pagination={{ pageSize: 10, showSizeChanger: true }}
       />
 

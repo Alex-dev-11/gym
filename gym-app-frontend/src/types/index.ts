@@ -1,13 +1,14 @@
-// src/types/index.ts
+// ============ КЛИЕНТЫ ============
+export type ClientStatus = "active" | "inactive" | "blacklist";
 
-// ===== КЛИЕНТЫ =====
-export type ClientStatus = 'active' | 'inactive' | 'blacklist'
-
-//ЕДИНЫЙ ИСТОЧНИК ИСТИНЫ: все статусы в одном месте
-export const CLIENT_STATUSES: Record<ClientStatus, { label: string; color: string }> = {
-  active: { label: 'Активный', color: 'success' },
-  inactive: { label: 'Неактивный', color: 'default' },
-  blacklist: { label: 'Черный список', color: 'error' },
+// Единый источник истины для статусов клиентов
+export const CLIENT_STATUSES: Record<
+  ClientStatus,
+  { label: string; color: string }
+> = {
+  active: { label: "Активный", color: "success" },
+  inactive: { label: "Неактивный", color: "default" },
+  blacklist: { label: "Чёрный список", color: "error" },
 };
 
 export interface ClientResponseDto {
@@ -17,8 +18,8 @@ export interface ClientResponseDto {
   patronymic?: string;
   phone: string;
   email?: string;
-  registrationDate: string; // DateTime приходит как ISO-строка
-  status: ClientStatus; // 'active' | 'inactive' | 'blacklisted'
+  registrationDate: string;
+  status: ClientStatus;
   isDeleted: boolean;
 }
 
@@ -30,43 +31,80 @@ export interface CreateClientDto {
   email?: string;
 }
 
-export interface UpdateClientDto {
-  lastName?: string;
-  firstName?: string;
-  patronymic?: string;
-  phone?: string;
-  email?: string;
+export interface UpdateClientDto extends Partial<CreateClientDto> {
   status?: ClientStatus;
   isDeleted?: boolean;
 }
 
-// ===== АБОНЕМЕНТЫ =====
-// src/types/index.ts
+// ============ АБОНЕМЕНТЫ ============
+export type MembershipType = "single" | "month" | "year";
+export type MembershipStatus = "active" | "completed" | "expired" | "cancelled";
+
+// Единый источник истины для типов абонементов
+export const MEMBERSHIP_TYPES: Record<
+  MembershipType,
+  { label: string; shortLabel: string; tableLabel: string; color: string }
+> = {
+  single: {
+    label: "Разовое посещение",
+    shortLabel: "1",
+    tableLabel: "Разовый",
+    color: "blue",
+  },
+  month: {
+    label: "Месяц (безлимит)",
+    shortLabel: "М",
+    tableLabel: "Месяц",
+    color: "green",
+  },
+  year: {
+    label: "Год (безлимит)",
+    shortLabel: "Г",
+    tableLabel: "Год",
+    color: "gold",
+  },
+};
+
+export const MEMBERSHIP_STATUSES: Record<
+  MembershipStatus,
+  { label: string; color: string }
+> = {
+  active: { label: "Активен", color: "green" },
+  completed: { label: "Завершён", color: "blue" },
+  expired: { label: "Истёк", color: "orange" },
+  cancelled: { label: "Отменён", color: "red" },
+};
 
 export interface MembershipResponseDto {
   id: number;
   clientId: number;
-  clientFullName: string; // <-- ДОБАВЛЯЕМ ЭТО ПОЛЕ
-  type: string; // 'single' | 'month' | 'year'
+  clientFullName: string;
+  type: MembershipType;
   startDate: string;
   endDate: string;
+  status: MembershipStatus;
   totalVisits: number;
   usedVisits: number;
-  status: string; // 'active' | 'completed' | 'expired' | 'cancelled'
 }
 
 export interface CreateMembershipDto {
   clientId: number;
-  type: string;
-  startDate: string; // Формат YYYY-MM-DD
+  type: MembershipType;
+  startDate: string;
 }
 
-// ===== ПОСЕЩЕНИЯ =====
+export interface MembershipsFilter {
+  clientId?: number;
+  status?: string;
+}
+
+// ============ ПОСЕЩЕНИЯ ============
 export interface VisitResponseDto {
   id: number;
   membershipId: number;
-  trainerId?: number;
-  processedByUserId?: number;
+  clientFullName: string;
+  membershipType: string;
+  trainerName?: string;
   visitTime: string;
 }
 
@@ -75,33 +113,11 @@ export interface CreateVisitDto {
   trainerId?: number;
 }
 
-// ===== ОШИБКИ API =====
-// Тип для стандартизированной ошибки от ExceptionHandlingMiddleware
-export interface ApiError {
-  error: string;
-  statusCode: number;
-}
-
-// --- VISITS TYPES ---
-
-export interface VisitResponseDto {
-  id: number;
-  membershipId: number;
-  clientFullName: string; // Приходит с бэкенда (JOIN с clients)
-  membershipType: string; // Приходит с бэкенда ('single', 'month', 'year')
-  trainerName?: string; // Опционально, если тренер указан
-  visitTime: string; // ISO-строка даты и времени (DateTime в C#)
-}
-
-export interface CreateVisitDto {
-  membershipId: number;
-  trainerId?: number; // Опционально
-}
-
 export interface VisitsFilter {
-  membershipId?: number; // Для фильтрации посещений конкретного абонемента
+  membershipId?: number;
 }
 
+// ============ СОТРУДНИКИ ============
 export interface EmployeeResponseDto {
   id: number;
   fullName: string;

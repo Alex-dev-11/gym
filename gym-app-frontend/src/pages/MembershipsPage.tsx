@@ -1,24 +1,22 @@
-// src/pages/MembershipsPage.tsx
 import { useState, useEffect } from 'react';
-import { Typography, Table, Button, Space, Tag, Select, message } from 'antd';
+import { Typography, Table, Button, Space, Tag, Select } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useMemberships } from '../hooks/useMemberships';
 import { clientsApi } from '../api/clients';
 import { MembershipFormModal } from '../components/memberships/MembershipFormModal';
-import type { MembershipResponseDto, ClientResponseDto } from '../types';
+import type { MembershipResponseDto, ClientResponseDto, MembershipStatus, MembershipType } from '../types';
+import { MEMBERSHIP_TYPES, MEMBERSHIP_STATUSES } from '../types';
 
 const { Title } = Typography;
 
 export function MembershipsPage() {
   const { memberships, loading, reload, updateFilter } = useMemberships();
   
-  // Состояния нужны только для фильтра по клиенту
   const [clients, setClients] = useState<ClientResponseDto[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [clientFilter, setClientFilter] = useState<number | undefined>(undefined);
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
 
-  // Загружаем клиентов ТОЛЬКО для выпадающего списка фильтра
   useEffect(() => {
     clientsApi.getAll().then(response => {
       setClients(response.data);
@@ -34,16 +32,18 @@ export function MembershipsPage() {
     },
     {
       title: 'Клиент',
-      dataIndex: 'clientFullName', // <-- БЕРЁМ НАПРЯМУЮ ИЗ ОТВЕТА!
+      dataIndex: 'clientFullName',
       key: 'clientFullName',
     },
     {
       title: 'Тип',
       dataIndex: 'type',
       key: 'type',
-      render: (type: string) => {
-        const text = type === 'single' ? 'Разовое' : type === 'month' ? 'Месяц' : 'Год';
-        return <Tag>{text}</Tag>;
+      width: 150,
+      render: (type: MembershipType) => {
+        const config = MEMBERSHIP_TYPES[type];
+        if (!config) return <Tag>{type}</Tag>;
+        return <Tag color={config.color}>{config.tableLabel}</Tag>;
       },
     },
     {
@@ -72,20 +72,10 @@ export function MembershipsPage() {
       title: 'Статус',
       dataIndex: 'status',
       key: 'status',
-      render: (status: string) => {
-        const colorMap: Record<string, string> = {
-          active: 'green',
-          completed: 'blue',
-          expired: 'orange',
-          cancelled: 'red',
-        };
-        const textMap: Record<string, string> = {
-          active: 'Активен',
-          completed: 'Завершён',
-          expired: 'Истёк',
-          cancelled: 'Отменён',
-        };
-        return <Tag color={colorMap[status] || 'default'}>{textMap[status] || status}</Tag>;
+      render: (status: MembershipStatus) => {
+        const config = MEMBERSHIP_STATUSES[status];
+        if (!config) return <Tag>{status}</Tag>;
+        return <Tag color={config.color}>{config.label}</Tag>;
       },
     },
   ];
@@ -102,7 +92,7 @@ export function MembershipsPage() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <Title level={2} style={{ margin: 0 }}>Абонементы</Title>
         <Button 
           type="primary" 
@@ -113,30 +103,28 @@ export function MembershipsPage() {
         </Button>
       </div>
 
-      <Space style={{ marginBottom: 16 }} size="middle">
+      <Space className="flex flex-wrap w-full mb-4" size="middle">
         <Select
           placeholder="Фильтр по клиенту"
           allowClear
           showSearch
-          optionFilterProp="children"
-          style={{ width: 250 }}
+          optionFilterProp="label"
+          className="w-full sm:w-[250px]"
           onChange={handleClientChange}
           options={clients.map(c => ({
             value: c.id,
-            label: c.clientFullName || `${c.lastName} ${c.firstName}`, // Fallback на случай, если clientFullName вдруг нет
+            label: `${c.lastName} ${c.firstName}`,
           }))}
         />
         <Select
           placeholder="Фильтр по статусу"
           allowClear
-          style={{ width: 200 }}
+          className="w-full sm:w-[200px]"
           onChange={handleStatusChange}
-          options={[
-            { value: 'active', label: 'Активен' },
-            { value: 'completed', label: 'Завершён' },
-            { value: 'expired', label: 'Истёк' },
-            { value: 'cancelled', label: 'Отменён' },
-          ]}
+          options={Object.entries(MEMBERSHIP_STATUSES).map(([value, { label }]) => ({
+            value,
+            label,
+          }))}
         />
       </Space>
 
@@ -145,6 +133,7 @@ export function MembershipsPage() {
         dataSource={memberships}
         rowKey="id"
         loading={loading}
+        scroll={{ x: 'max-content' }}
         pagination={{ pageSize: 10 }}
       />
 
