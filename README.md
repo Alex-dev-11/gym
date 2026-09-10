@@ -95,8 +95,9 @@ npm run dev
 1. Установите PostgreSQL 15+ локально.
 2. Создайте базу данных `gym_db` и пользователя `gym_app_user` (пароль из `gym_app_user.txt`).
 3. Откройте любой SQL-клиент (DBeaver, pgAdmin, psql) и выполните скрипты **строго в этом порядке**:
-   - Сначала: `db_sql_scripts/01_db_structure.sql` (создаст таблицы)
-   - Затем: `db_sql_scripts/02_seed_data.sql` (добавит демо-данные)
+   - `db_sql_scripts/00_db_create.sql` (создаст БД)
+   - `db_sql_scripts/01_db_structure.sql` (создаст таблицы)
+   - `db_sql_scripts/02_seed_data.sql` (добавит демо-данные)
 4. Далее следуйте Шагам 3 и 4 из инструкции выше.
 
 ---
