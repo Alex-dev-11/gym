@@ -28,6 +28,7 @@
 │   │   ├── Employees
 │   │   │   ├── CreateEmployeeDto.cs
 │   │   │   ├── EmployeeResponseDto.cs
+│   │   │   ├── TrainerSelectDto.cs
 │   │   │   └── UpdateEmployeeDto.cs
 │   │   ├── Memberships
 │   │   │   ├── CreateMembershipDto.cs

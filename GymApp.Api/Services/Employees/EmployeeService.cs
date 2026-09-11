@@ -29,19 +29,15 @@ public class EmployeeService : IEmployeeService
             .ToListAsync();
     }
 
-    public async Task<List<EmployeeResponseDto>> GetActiveTrainersAsync()
+    public async Task<List<TrainerSelectDto>> GetActiveTrainersAsync()
     {
         return await _context.Employees
             .Where(e => e.Position == "trainer" && e.IsActive)
-            .Select(e => new EmployeeResponseDto
+            .Select(e => new TrainerSelectDto
             {
                 Id = e.Id,
-                LastName = e.LastName,
-                FirstName = e.FirstName,
-                Patronymic = e.Patronymic,
-                Phone = e.Phone,
-                Position = e.Position,
-                IsActive = e.IsActive
+                FullName = string.Join(" ", new[] { e.LastName, e.FirstName, e.Patronymic }
+                    .Where(s => !string.IsNullOrWhiteSpace(s)))
             })
             .ToListAsync();
     }
