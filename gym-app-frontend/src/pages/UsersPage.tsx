@@ -103,7 +103,7 @@ export function UsersPage() {
         dataSource={users.filter(u => u.isActive)}
         rowKey="id"
         loading={loading}
-        scroll={{ x: 'max-content' }}
+        scroll={{ x: 1000 }}
         pagination={tablePagination}
         locale={{ emptyText: 'Пользователи не найдены' }}
       />

@@ -158,7 +158,6 @@
 │   ├── tsconfig.json
 │   ├── tsconfig.node.json
 │   └── vite.config.ts
-├── gym_db_structure.sql
 └── src
     ├── App.tsx
     ├── api

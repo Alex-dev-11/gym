@@ -98,7 +98,7 @@ public class ClientService : IClientService
             Phone = dto.Phone,
             Email = dto.Email,
             RegistrationDate = DateTime.Now,
-            Status = "Active",
+            Status = "active",
             IsDeleted = false
         };
 

@@ -145,7 +145,7 @@ export function EmployeesPage() {
         dataSource={employees}
         rowKey="id"
         loading={loading}
-        scroll={{ x: 'max-content' }}
+        scroll={{ x: 1000 }}
         pagination={tablePagination}
         locale={{ emptyText: 'Сотрудники не найдены' }}
       />

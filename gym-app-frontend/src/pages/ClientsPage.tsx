@@ -148,7 +148,7 @@ export function ClientsPage() {
         dataSource={clients}
         rowKey="id"
         loading={loading}
-        scroll={{ x: 'max-content' }}
+        scroll={{ x: 1000 }}
         pagination={tablePagination}
       />
 

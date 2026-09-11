@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Typography, Table, Button, Space, Tag, Select } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useMemberships } from '../hooks/useMemberships';
@@ -19,10 +19,17 @@ export function MembershipsPage() {
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    clientsApi.getAll().then(response => {
-      setClients(response.data);
+    clientsApi.getAll().then(data => {
+      setClients(data || []);
     });
   }, []);
+
+  const clientOptions = useMemo(() => 
+    clients.map(c => ({
+      value: c.id,
+      label: `${c.lastName} ${c.firstName}`,
+    })),
+  [clients]);
 
   const columns = [
     {
@@ -112,10 +119,7 @@ export function MembershipsPage() {
           optionFilterProp="label"
           className="w-full sm:w-[250px]"
           onChange={handleClientChange}
-          options={clients.map(c => ({
-            value: c.id,
-            label: `${c.lastName} ${c.firstName}`,
-          }))}
+          options={clientOptions}
         />
         <Select
           placeholder="Фильтр по статусу"
@@ -134,7 +138,7 @@ export function MembershipsPage() {
         dataSource={memberships}
         rowKey="id"
         loading={loading}
-        scroll={{ x: 'max-content' }}
+        scroll={{ x: 1000 }}
         pagination={tablePagination}
       />
 

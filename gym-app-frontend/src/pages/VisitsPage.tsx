@@ -37,10 +37,7 @@ export const VisitsPage: React.FC = () => {
       setMembershipsLoading(true);
       try {
         const data = await membershipsApi.getAll();
-        const list = Array.isArray(data)
-          ? data
-          : (data as unknown as { data: MembershipResponseDto[] }).data ?? [];
-        setAllMemberships(list);
+        setAllMemberships(data || []);
       } catch {
         message.error("Не удалось загрузить список абонементов");
       } finally {
@@ -50,6 +47,13 @@ export const VisitsPage: React.FC = () => {
 
     loadMemberships();
   }, []);
+
+  const membershipOptions = useMemo(() => 
+    allMemberships.map((m) => ({
+      value: m.id,
+      label: `${m.clientFullName} — ${MEMBERSHIP_TYPES[m.type as MembershipType]?.shortLabel || m.type}`,
+    })),
+  [allMemberships]);
 
   const columns: ColumnsType<VisitResponseDto> = useMemo(
     () => [
@@ -139,10 +143,7 @@ export const VisitsPage: React.FC = () => {
           style={{ width: window.innerWidth < 768 ? '100%' : 300 }}
           value={filter.membershipId}
           onChange={handleMembershipFilterChange}
-          options={allMemberships.map((m) => ({
-            value: m.id,
-            label: `${m.clientFullName} — ${MEMBERSHIP_TYPES[m.type as MembershipType]?.shortLabel || m.type}`,
-          }))}
+          options={membershipOptions}
         />
       </Space>
 
@@ -151,7 +152,7 @@ export const VisitsPage: React.FC = () => {
         dataSource={visits}
         rowKey="id"
         loading={loading}
-        scroll={{ x: 'max-content' }}
+        scroll={{ x: 1000 }}
         pagination={tablePagination}
         locale={{
           emptyText: "Посещения не найдены",
