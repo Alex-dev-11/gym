@@ -25,8 +25,8 @@ public class UserService : IUserService
                 FullName = u.Employee != null
                     ? $"{u.Employee.LastName} {u.Employee.FirstName} {u.Employee.Patronymic}".Trim()
                     : u.Login,
-                IsActive = u.IsActive ?? false, // 👈 Исправлено: nullable в bool
-                CreatedAt = u.CreatedAt ?? DateTime.Now // 👈 Исправлено: nullable в DateTime
+                IsActive = u.IsActive ?? false,
+                CreatedAt = u.CreatedAt ?? DateTime.Now
             })
             .ToListAsync();
     }
@@ -45,7 +45,7 @@ public class UserService : IUserService
         {
             Login = dto.Login,
             PasswordHash = passwordHash,
-            Role = dto.Role,
+            Role = dto.Role, // <-- Используем Role (string)
             EmployeeId = dto.EmployeeId,
             IsActive = true,
             CreatedAt = DateTime.Now
@@ -83,6 +83,28 @@ public class UserService : IUserService
             throw new KeyNotFoundException($"Пользователь с ID {id} не найден");
 
         user.IsActive = false; // Мягкое удаление
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(int id, UpdateUserDto dto)
+    {
+        var user = await _context.SystemUsers.FindAsync(id);
+        if (user == null)
+        {
+            throw new KeyNotFoundException("Пользователь не найден");
+        }
+
+        user.Login = dto.Login;
+        user.Role = dto.Role;
+        user.EmployeeId = dto.EmployeeId;
+        user.IsActive = dto.IsActive;
+
+        // Если передан новый пароль — хешируем и обновляем
+        if (!string.IsNullOrWhiteSpace(dto.Password))
+        {
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+        }
+
         await _context.SaveChangesAsync();
     }
 }

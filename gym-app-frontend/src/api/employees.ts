@@ -19,6 +19,13 @@ export const employeesApi = {
     return response.data;
   },
 
+  getAdministrative: async () => {
+    const response = await apiClient.get<EmployeeResponseDto[]>(
+      "/employees/administrative",
+    );
+    return response.data;
+  },
+
   create: async (data: CreateEmployeeDto) => {
     const response = await apiClient.post<EmployeeResponseDto>(
       "/employees",
@@ -37,5 +44,9 @@ export const employeesApi = {
 
   delete: async (id: number) => {
     await apiClient.delete(`/employees/${id}`);
+  },
+
+  updateStatus: async (id: number, isActive: boolean) => {
+    await apiClient.patch(`/employees/${id}/status`, { isActive });
   },
 };

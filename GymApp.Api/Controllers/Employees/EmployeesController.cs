@@ -57,4 +57,13 @@ public class EmployeesController : ControllerBase
         await _employeeService.DeleteAsync(id);
         return NoContent();
     }
+
+    // GET: api/employees/administrative
+    [HttpGet("administrative")]
+    public async Task<IActionResult> GetAdministrativeEmployees()
+    {
+        var employees = await _employeeService.GetAdministrativeEmployeesAsync();
+        return Ok(employees);
+    }
+
 }

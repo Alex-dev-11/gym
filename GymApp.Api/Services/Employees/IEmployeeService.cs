@@ -9,4 +9,6 @@ public interface IEmployeeService
     Task<EmployeeResponseDto> CreateAsync(CreateEmployeeDto dto);
     Task<EmployeeResponseDto> UpdateAsync(int id, UpdateEmployeeDto dto);
     Task DeleteAsync(int id);
+
+    Task<List<EmployeeResponseDto>> GetAdministrativeEmployeesAsync();
 }

@@ -37,4 +37,13 @@ public class UsersController : ControllerBase
         await _userService.DeleteUserAsync(id);
         return NoContent();
     }
+
+    // PUT: api/users/5
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateUserDto dto)
+    {
+        await _userService.UpdateAsync(id, dto);
+        return NoContent(); // 204 No Content — стандарт для успешного PUT
+    }
+
 }

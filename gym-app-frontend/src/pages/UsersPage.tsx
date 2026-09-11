@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { Typography, Table, Button, Tag, Popconfirm, message } from 'antd';
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Typography, Table, Button, Tag } from 'antd';
+import { PlusOutlined, EditOutlined } from '@ant-design/icons';
 import { useUsers } from '../hooks/useUsers';
-import { usersApi } from '../api/users';
 import { UserFormModal } from '../components/users/UserFormModal';
 import { USER_ROLES, type UserResponseDto, type UserRole } from '../types';
 import { tablePagination } from '../utils/tableConfig';
@@ -12,15 +11,16 @@ const { Title } = Typography;
 export function UsersPage() {
   const { users, loading, reload } = useUsers();
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<UserResponseDto | null>(null);
 
-  const handleDelete = async (id: number) => {
-    try {
-      await usersApi.delete(id);
-      message.success('Пользователь деактивирован');
-      reload();
-    } catch {
-      message.error('Ошибка при удалении');
-    }
+  const handleEdit = (user: UserResponseDto) => {
+    setEditingUser(user);
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setEditingUser(null);
   };
 
   const columns = [
@@ -35,10 +35,7 @@ export function UsersPage() {
       dataIndex: 'fullName',
       key: 'fullName',
       render: (fullName: string, record: UserResponseDto) => {
-        // Если fullName совпадает с login, значит сотрудник не привязан
-        if (fullName === record.login) {
-          return <span className="text-gray-400">—</span>;
-        }
+        if (fullName === record.login) return <span className="text-gray-400">—</span>;
         return <span className="font-medium">{fullName}</span>;
       },
     },
@@ -66,21 +63,16 @@ export function UsersPage() {
     {
       title: 'Действия',
       key: 'actions',
-      width: 80,
+      width: 100,
       render: (_: unknown, record: UserResponseDto) => (
-        <Popconfirm
-          title="Деактивировать пользователя?"
-          onConfirm={() => handleDelete(record.id)}
-          okText="Да"
-          cancelText="Нет"
+        <Button
+          type="link"
+          icon={<EditOutlined />}
+          onClick={() => handleEdit(record)}
+          size="small"
         >
-          <Button
-            type="link"
-            danger
-            icon={<DeleteOutlined />}
-            disabled={!record.isActive}
-          />
-        </Popconfirm>
+          Изменить
+        </Button>
       ),
     },
   ];
@@ -89,18 +81,14 @@ export function UsersPage() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <Title level={2} style={{ margin: 0 }}>Пользователи системы</Title>
-        <Button 
-          type="primary" 
-          icon={<PlusOutlined />} 
-          onClick={() => setModalOpen(true)}
-        >
+        <Button type="primary" icon={<PlusOutlined />} onClick={() => { setEditingUser(null); setModalOpen(true); }}>
           Добавить пользователя
         </Button>
       </div>
 
       <Table
         columns={columns}
-        dataSource={users.filter(u => u.isActive)}
+        dataSource={users} // Показываем всех, чтобы можно было редактировать неактивных
         rowKey="id"
         loading={loading}
         scroll={{ x: 1000 }}
@@ -110,8 +98,9 @@ export function UsersPage() {
 
       <UserFormModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSuccess={reload}
+        user={editingUser}
+        onClose={handleModalClose}
+        onSuccess={() => { reload(); handleModalClose(); }}
       />
     </div>
   );

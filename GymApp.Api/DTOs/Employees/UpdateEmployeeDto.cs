@@ -7,5 +7,5 @@ public class UpdateEmployeeDto
     public string? Patronymic { get; set; }
     public string? Phone { get; set; } = string.Empty;
     public string Position { get; set; } = string.Empty;
-    public bool? IsActive { get; set; } // Позволяет восстановить сотрудника
+    public bool IsActive { get; set; } // Позволяет восстановить сотрудника
 }

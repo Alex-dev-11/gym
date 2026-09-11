@@ -7,4 +7,6 @@ public interface IUserService
     Task<List<UserResponseDto>> GetAllUsersAsync();
     Task<UserResponseDto> CreateUserAsync(CreateUserDto dto);
     Task DeleteUserAsync(int id);
+
+    Task UpdateAsync(int id, UpdateUserDto dto);
 }

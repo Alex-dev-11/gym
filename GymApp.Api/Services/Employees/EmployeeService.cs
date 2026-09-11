@@ -78,17 +78,10 @@ public class EmployeeService : IEmployeeService
 
     public async Task<EmployeeResponseDto> UpdateAsync(int id, UpdateEmployeeDto dto)
     {
-        var employee = await _context.Employees.FindAsync(id)
-            ?? throw new KeyNotFoundException($"Сотрудник с ID {id} не найден");
-
-        // Если меняется телефон, проверяем, не занят ли он другим активным сотрудником
-        if (employee.Phone != dto.Phone)
+        var employee = await _context.Employees.FindAsync(id);
+        if (employee == null)
         {
-            var phoneExists = await _context.Employees.AnyAsync(e => e.Phone == dto.Phone && e.Id != id && e.IsActive);
-            if (phoneExists)
-            {
-                throw new InvalidOperationException($"Телефон {dto.Phone} уже используется другим сотрудником");
-            }
+            throw new KeyNotFoundException("Сотрудник не найден");
         }
 
         employee.LastName = dto.LastName;
@@ -97,11 +90,8 @@ public class EmployeeService : IEmployeeService
         employee.Phone = dto.Phone;
         employee.Position = dto.Position;
 
-        // Обновляем статус активности (для восстановления или деактивации)
-        if (dto.IsActive.HasValue)
-        {
-            employee.IsActive = dto.IsActive.Value;
-        }
+        // 🔥 ИСПРАВЛЕНО: Прямое присваивание, так как dto.IsActive теперь строгий bool
+        employee.IsActive = dto.IsActive;
 
         await _context.SaveChangesAsync();
 
@@ -130,5 +120,25 @@ public class EmployeeService : IEmployeeService
         // Мягкое удаление
         employee.IsActive = false;
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<List<EmployeeResponseDto>> GetAdministrativeEmployeesAsync()
+    {
+        // Список должностей, которым разрешено иметь учетную запись в системе
+        var allowedPositions = new[] { "administrator", "manager", "director" };
+
+        return await _context.Employees
+            .Where(e => allowedPositions.Contains(e.Position) && e.IsActive)
+            .Select(e => new EmployeeResponseDto
+            {
+                Id = e.Id,
+                LastName = e.LastName,
+                FirstName = e.FirstName,
+                Patronymic = e.Patronymic,
+                Phone = e.Phone,
+                Position = e.Position,
+                IsActive = e.IsActive
+            })
+            .ToListAsync();
     }
 }

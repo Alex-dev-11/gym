@@ -140,17 +140,26 @@ export interface LoginResponseDto {
 export interface UserResponseDto {
   id: number;
   login: string;
-  role: string;
-  fullName: string;
+  role: string; // Бэк возвращает строку (или enum), а не roleId
+  employeeId?: number | null; // Добавляем, чтобы модалка могла его прочитать
   isActive: boolean;
-  createdAt: string;
+  fullName?: string; // Для отображения в таблице
 }
 
 export interface CreateUserDto {
   login: string;
   password: string;
+  role: string; // Или roleId: number, в зависимости от того, что ждет твой бэк. Оставим role для единообразия.
+  employeeId?: number | null;
+  isActive: boolean;
+}
+
+export interface UpdateUserDto {
+  login: string;
+  password?: string; // Необязателен при редактировании (чтобы не менять пароль, если поле пустое)
   role: string;
-  employeeId?: number;
+  employeeId?: number | null;
+  isActive: boolean;
 }
 
 // ============ РОЛИ ПОЛЬЗОВАТЕЛЕЙ ============
@@ -161,13 +170,22 @@ export const USER_ROLES: Record<UserRole, { label: string; color: string }> = {
   operator: { label: "Оператор", color: "blue" },
 };
 
-// 
+export type EmployeePosition =
+  | "administrator"
+  | "trainer"
+  | "manager"
+  | "director"
+  | "cleaner";
 
-export type EmployeePosition = "administrator" | "trainer";
-
-export const EMPLOYEE_POSITIONS: Record<EmployeePosition, { label: string }> = {
-  administrator: { label: "Администратор" },
-  trainer: { label: "Тренер" },
+export const EMPLOYEE_POSITIONS: Record<
+  EmployeePosition,
+  { label: string; color: string }
+> = {
+  administrator: { label: "Администратор", color: "blue" },
+  trainer: { label: "Тренер", color: "green" },
+  manager: { label: "Менеджер", color: "purple" },
+  director: { label: "Директор", color: "gold" },
+  cleaner: { label: "Уборщик", color: "default" },
 };
 
 export interface EmployeeResponseDto {

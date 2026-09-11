@@ -29,13 +29,15 @@
 │   │   │   ├── CreateEmployeeDto.cs
 │   │   │   ├── EmployeeResponseDto.cs
 │   │   │   ├── TrainerSelectDto.cs
-│   │   │   └── UpdateEmployeeDto.cs
+│   │   │   ├── UpdateEmployeeDto.cs
+│   │   │   └── UpdateEmployeeStatusDto.cs
 │   │   ├── Memberships
 │   │   │   ├── CreateMembershipDto.cs
 │   │   │   ├── MembershipResponseDto.cs
 │   │   │   └── UpdateMembershipDto.cs
 │   │   ├── Users
 │   │   │   ├── CreateUserDto.cs
+│   │   │   ├── UpdateUserDto.cs
 │   │   │   └── UserResponseDto.cs
 │   │   └── Visits
 │   │       ├── CreateVisitDto.cs
@@ -139,6 +141,7 @@
 │   │   │       └── VisitFormModal.tsx
 │   │   ├── hooks
 │   │   │   ├── useClients.ts
+│   │   │   ├── useEmployees.ts
 │   │   │   ├── useMemberships.ts
 │   │   │   ├── useUsers.ts
 │   │   │   └── useVisits.ts
