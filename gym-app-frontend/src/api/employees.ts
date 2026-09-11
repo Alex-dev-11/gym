@@ -3,6 +3,7 @@ import type {
   EmployeeResponseDto,
   CreateEmployeeDto,
   UpdateEmployeeDto,
+  TrainerSelectDto
 } from "../types";
 
 export const employeesApi = {
@@ -12,7 +13,7 @@ export const employeesApi = {
   },
 
   getActiveTrainers: async () => {
-    const response = await apiClient.get<EmployeeResponseDto[]>(
+    const response = await apiClient.get<TrainerSelectDto[]>(
       "/employees/trainers",
     );
     return response.data;

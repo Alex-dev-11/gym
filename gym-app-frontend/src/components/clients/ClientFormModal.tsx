@@ -17,7 +17,6 @@ export function ClientFormModal({ open, editingClient, onClose, onSuccess }: Pro
   
   const isEditMode = !!editingClient;
   const isDeleted = editingClient?.isDeleted;
-
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
   useEffect(() => {
@@ -43,12 +42,10 @@ export function ClientFormModal({ open, editingClient, onClose, onSuccess }: Pro
       setSubmitting(true);
 
       if (isEditMode && editingClient) {
-        const updateData: UpdateClientDto = values;
-        await clientsApi.update(editingClient.id, updateData);
+        await clientsApi.update(editingClient.id, values as UpdateClientDto);
         message.success('Клиент обновлён');
       } else {
-        const createData: CreateClientDto = values;
-        await clientsApi.create(createData);
+        await clientsApi.create(values as CreateClientDto);
         message.success('Клиент создан');
       }
 
@@ -56,18 +53,12 @@ export function ClientFormModal({ open, editingClient, onClose, onSuccess }: Pro
       onSuccess();
       onClose();
     } catch (error: any) {
-      if (error.errorFields) {
-        return;
-      }
+      if (error.errorFields) return; // Ошибка валидации, игнорируем
       console.error('Error saving client:', error);
+      message.error('Ошибка сохранения');
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const handleCancel = () => {
-    form.resetFields();
-    onClose();
   };
 
   return (
@@ -75,7 +66,7 @@ export function ClientFormModal({ open, editingClient, onClose, onSuccess }: Pro
       title={isEditMode ? 'Редактировать клиента' : 'Новый клиент'}
       open={open}
       onOk={handleSubmit}
-      onCancel={handleCancel}
+      onCancel={() => { form.resetFields(); onClose(); }}
       confirmLoading={submitting}
       okText="Сохранить"
       cancelText="Отмена"
@@ -93,65 +84,28 @@ export function ClientFormModal({ open, editingClient, onClose, onSuccess }: Pro
         />
       )}
 
-      <Form
-        form={form}
-        layout="vertical"
-        autoComplete="off"
-        disabled={isDeleted}
-      >
-        <Form.Item
-          label="Фамилия"
-          name="lastName"
-          rules={[{ required: true, message: 'Введите фамилию' }]}
-        >
+      <Form form={form} layout="vertical" autoComplete="off" disabled={isDeleted}>
+        <Form.Item label="Фамилия" name="lastName" rules={[{ required: true, message: 'Введите фамилию' }]}>
           <Input placeholder="Иванов" />
         </Form.Item>
-
-        <Form.Item
-          label="Имя"
-          name="firstName"
-          rules={[{ required: true, message: 'Введите имя' }]}
-        >
+        <Form.Item label="Имя" name="firstName" rules={[{ required: true, message: 'Введите имя' }]}>
           <Input placeholder="Иван" />
         </Form.Item>
-
-        <Form.Item
-          label="Отчество"
-          name="patronymic"
-        >
+        <Form.Item label="Отчество" name="patronymic">
           <Input placeholder="Иванович" />
         </Form.Item>
-
-        <Form.Item
-          label="Телефон"
-          name="phone"
-          rules={[
-            { required: true, message: 'Введите телефон' },
-            { pattern: /^\+?[0-9\s\-()]{10,20}$/, message: 'Некорректный формат' }
-          ]}
-        >
+        <Form.Item label="Телефон" name="phone" rules={[{ required: true, message: 'Введите телефон' }, { pattern: /^\+?[0-9\s\-()]{10,20}$/, message: 'Некорректный формат' }]}>
           <Input placeholder="+7 (999) 123-45-67" />
         </Form.Item>
-
-        <Form.Item
-          label="Email"
-          name="email"
-          rules={[{ type: 'email', message: 'Некорректный email' }]}
-        >
+        <Form.Item label="Email" name="email" rules={[{ type: 'email', message: 'Некорректный email' }]}>
           <Input placeholder="example@mail.com" />
         </Form.Item>
 
         {isEditMode && (
-          <Form.Item
-            label="Статус клиента"
-            name="status"
-            rules={[{ required: true, message: 'Выберите статус' }]}
-          >
+          <Form.Item label="Статус клиента" name="status" rules={[{ required: true, message: 'Выберите статус' }]}>
             <Select placeholder="Выберите статус">
               {Object.entries(CLIENT_STATUSES).map(([value, { label }]) => (
-                <Select.Option key={value} value={value}>
-                  {label}
-                </Select.Option>
+                <Select.Option key={value} value={value}>{label}</Select.Option>
               ))}
             </Select>
           </Form.Item>

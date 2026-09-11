@@ -117,8 +117,8 @@ export interface VisitsFilter {
   membershipId?: number;
 }
 
-// ============ СОТРУДНИКИ ============
-export interface EmployeeResponseDto {
+// ============ ТРЕНЕРА ============
+export interface TrainerSelectDto {
   id: number;
   fullName: string;
 }

@@ -16,16 +16,16 @@ export function MembershipFormModal({ open, onClose, onSuccess }: Props) {
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
   const [clients, setClients] = useState<ClientResponseDto[]>([]);
-
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
 
   useEffect(() => {
     if (open) {
-      clientsApi.getAll().then(response => {
-        const activeClients = response.data.filter(c => c.status === 'active' && !c.isDeleted);
+      form.resetFields();
+      // ✅ ИСПРАВЛЕНО: data - это уже массив, response.data больше не нужен
+      clientsApi.getAll().then(data => {
+        const activeClients = data.filter(c => c.status === 'active' && !c.isDeleted);
         setClients(activeClients);
       });
-      form.resetFields();
     }
   }, [open, form]);
 
@@ -47,18 +47,12 @@ export function MembershipFormModal({ open, onClose, onSuccess }: Props) {
       onSuccess();
       onClose();
     } catch (error: any) {
-      if (error.errorFields) {
-        return;
-      }
+      if (error.errorFields) return;
       console.error('Error creating membership:', error);
+      message.error('Ошибка создания абонемента');
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const handleCancel = () => {
-    form.resetFields();
-    onClose();
   };
 
   return (
@@ -66,7 +60,7 @@ export function MembershipFormModal({ open, onClose, onSuccess }: Props) {
       title="Новый абонемент"
       open={open}
       onOk={handleSubmit}
-      onCancel={handleCancel}
+      onCancel={() => { form.resetFields(); onClose(); }}
       confirmLoading={submitting}
       okText="Создать"
       cancelText="Отмена"
@@ -75,18 +69,12 @@ export function MembershipFormModal({ open, onClose, onSuccess }: Props) {
       style={isMobile ? { top: 20 } : undefined}
     >
       <Form form={form} layout="vertical" autoComplete="off">
-        <Form.Item
-          label="Клиент"
-          name="clientId"
-          rules={[{ required: true, message: 'Выберите клиента' }]}
-        >
+        <Form.Item label="Клиент" name="clientId" rules={[{ required: true, message: 'Выберите клиента' }]}>
           <Select
             placeholder="Выберите клиента"
             showSearch
             optionFilterProp="label"
-            filterOption={(input, option) =>
-              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-            }
+            filterOption={(input, option) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
             options={clients.map(c => ({
               value: c.id,
               label: `${c.lastName} ${c.firstName} (${c.phone})`,
@@ -94,30 +82,19 @@ export function MembershipFormModal({ open, onClose, onSuccess }: Props) {
           />
         </Form.Item>
 
-        <Form.Item
-          label="Тип абонемента"
-          name="type"
-          rules={[{ required: true, message: 'Выберите тип абонемента' }]}
-        >
+        <Form.Item label="Тип абонемента" name="type" rules={[{ required: true, message: 'Выберите тип абонемента' }]}>
           <Select placeholder="Выберите тип">
             {Object.entries(MEMBERSHIP_TYPES).map(([value, { label }]) => (
-              <Select.Option key={value} value={value}>
-                {label}
-              </Select.Option>
+              <Select.Option key={value} value={value}>{label}</Select.Option>
             ))}
           </Select>
         </Form.Item>
 
-        <Form.Item
-          label="Дата начала"
-          name="startDate"
-          rules={[{ required: true, message: 'Выберите дату начала' }]}
-          initialValue={dayjs()}
-        >
+        <Form.Item label="Дата начала" name="startDate" rules={[{ required: true, message: 'Выберите дату начала' }]} initialValue={dayjs()}>
           <DatePicker 
             style={{ width: '100%' }}
             format="YYYY-MM-DD"
-            disabledDate={(current) => current && current < dayjs().startOf('day')}
+            disabledDate={(current) => !!current && current < dayjs().startOf('day')}
           />
         </Form.Item>
         

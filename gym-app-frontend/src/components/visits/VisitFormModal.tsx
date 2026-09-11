@@ -3,12 +3,7 @@ import { Modal, Form, Select, Button, message } from "antd";
 import { visitsApi } from "../../api/visits";
 import { membershipsApi } from "../../api/memberships";
 import { employeesApi } from "../../api/employees";
-import type {
-  CreateVisitDto,
-  MembershipResponseDto,
-  EmployeeResponseDto,
-  MembershipType,
-} from "../../types";
+import type { CreateVisitDto, MembershipResponseDto, TrainerSelectDto, MembershipType } from "../../types";
 import { MEMBERSHIP_TYPES } from "../../types";
 
 interface VisitFormModalProps {
@@ -17,18 +12,14 @@ interface VisitFormModalProps {
   onSuccess: () => void;
 }
 
-export const VisitFormModal: React.FC<VisitFormModalProps> = ({
-  open,
-  onClose,
-  onSuccess,
-}) => {
+export const VisitFormModal: React.FC<VisitFormModalProps> = ({ open, onClose, onSuccess }) => {
   const [form] = Form.useForm<CreateVisitDto>();
   const [loading, setLoading] = useState(false);
 
   const [activeMemberships, setActiveMemberships] = useState<MembershipResponseDto[]>([]);
   const [membershipsLoading, setMembershipsLoading] = useState(false);
 
-  const [trainers, setTrainers] = useState<EmployeeResponseDto[]>([]);
+  const [trainers, setTrainers] = useState<TrainerSelectDto[]>([]);
   const [trainersLoading, setTrainersLoading] = useState(false);
 
   const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
@@ -39,8 +30,8 @@ export const VisitFormModal: React.FC<VisitFormModalProps> = ({
     const loadData = async () => {
       setMembershipsLoading(true);
       try {
-        const data = await membershipsApi.getAll({ status: "active" });
-        const list = Array.isArray(data) ? data : (data as unknown as { data: MembershipResponseDto[] }).data ?? [];
+        // ✅ API возвращает чистый массив
+        const list = await membershipsApi.getAll({ status: "active" });
         setActiveMemberships(list);
       } catch {
         message.error("Не удалось загрузить список абонементов");
@@ -50,8 +41,7 @@ export const VisitFormModal: React.FC<VisitFormModalProps> = ({
 
       setTrainersLoading(true);
       try {
-        const data = await employeesApi.getActiveTrainers();
-        const list = Array.isArray(data) ? data : (data as unknown as { data: EmployeeResponseDto[] }).data ?? [];
+        const list = await employeesApi.getActiveTrainers();
         setTrainers(list);
       } catch {
         message.error("Не удалось загрузить список тренеров");
@@ -72,6 +62,7 @@ export const VisitFormModal: React.FC<VisitFormModalProps> = ({
       onClose();
     } catch (err) {
       console.error("Failed to create visit:", err);
+      message.error("Ошибка регистрации посещения");
     } finally {
       setLoading(false);
     }
@@ -83,26 +74,15 @@ export const VisitFormModal: React.FC<VisitFormModalProps> = ({
       open={open}
       onCancel={onClose}
       afterOpenChange={(isOpen) => {
-        if (!isOpen) {
-          form.resetFields();
-        }
+        if (!isOpen) form.resetFields();
       }}
       destroyOnHidden
       footer={null}
       width={isMobile ? '95%' : 500}
       style={isMobile ? { top: 20 } : undefined}
     >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        autoComplete="off"
-      >
-        <Form.Item
-          name="membershipId"
-          label="Абонемент"
-          rules={[{ required: true, message: "Пожалуйста, выберите абонемент" }]}
-        >
+      <Form form={form} layout="vertical" onFinish={handleSubmit} autoComplete="off">
+        <Form.Item name="membershipId" label="Абонемент" rules={[{ required: true, message: "Пожалуйста, выберите абонемент" }]}>
           <Select
             placeholder="Выберите активный абонемент"
             loading={membershipsLoading}
@@ -112,9 +92,7 @@ export const VisitFormModal: React.FC<VisitFormModalProps> = ({
               value: m.id,
               label: `${m.clientFullName} — ${MEMBERSHIP_TYPES[m.type as MembershipType]?.tableLabel || m.type}`,
             }))}
-            notFoundContent={
-              membershipsLoading ? "Загрузка..." : "Нет активных абонементов"
-            }
+            notFoundContent={membershipsLoading ? "Загрузка..." : "Нет активных абонементов"}
           />
         </Form.Item>
 
@@ -125,13 +103,8 @@ export const VisitFormModal: React.FC<VisitFormModalProps> = ({
             showSearch
             optionFilterProp="label"
             allowClear
-            options={trainers.map((t) => ({
-              value: t.id,
-              label: t.fullName,
-            }))}
-            notFoundContent={
-              trainersLoading ? "Загрузка..." : "Нет доступных тренеров"
-            }
+            options={trainers.map((t) => ({ value: t.id, label: t.fullName }))}
+            notFoundContent={trainersLoading ? "Загрузка..." : "Нет доступных тренеров"}
           />
         </Form.Item>
 

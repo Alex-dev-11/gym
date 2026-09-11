@@ -1,7 +1,7 @@
 import { Modal, Form, Input, Select, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { employeesApi } from '../../api/employees';
-import { EMPLOYEE_POSITIONS, type EmployeeResponseDto, type CreateEmployeeDto, type UpdateEmployeeDto} from '../../types';
+import { EMPLOYEE_POSITIONS, type EmployeeResponseDto, type CreateEmployeeDto, type UpdateEmployeeDto } from '../../types';
 
 interface Props {
   open: boolean;
