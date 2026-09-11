@@ -1,4 +1,3 @@
-// src/hooks/useVisits.ts
 import { useState, useEffect, useCallback } from "react";
 import { visitsApi } from "../api/visits";
 import type { VisitResponseDto, VisitsFilter } from "../types";
@@ -9,13 +8,10 @@ export function useVisits(initialFilter?: VisitsFilter) {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<VisitsFilter>(initialFilter || {});
 
-  // Функция для ручного обновления (например, после успешного создания посещения)
   const reload = useCallback(async () => {
     setLoading(true);
     try {
       const data = await visitsApi.getAll(filter);
-      // Примечание: если visitsApi.getAll возвращает весь объект ответа axios,
-      // а не только данные, измени на: setVisits(data.data);
       setVisits(data);
       setError(null);
     } catch (err) {
@@ -26,7 +22,6 @@ export function useVisits(initialFilter?: VisitsFilter) {
     }
   }, [filter]);
 
-  // Эффект для первоначальной загрузки и при изменении фильтра
   useEffect(() => {
     let isMounted = true;
 
@@ -54,9 +49,8 @@ export function useVisits(initialFilter?: VisitsFilter) {
     return () => {
       isMounted = false;
     };
-  }, [filter]); // Перезагружаем данные при изменении фильтра
+  }, [filter]);
 
-  // Функция для изменения фильтра (вызывается из компонента)
   const updateFilter = useCallback((newFilter: VisitsFilter) => {
     setFilter(newFilter);
   }, []);

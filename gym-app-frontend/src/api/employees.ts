@@ -11,7 +11,6 @@ export const employeesApi = {
     return response.data;
   },
 
-  // Этот метод у вас уже был, оставляем для совместимости
   getActiveTrainers: async () => {
     const response = await apiClient.get<EmployeeResponseDto[]>(
       "/employees/trainers",

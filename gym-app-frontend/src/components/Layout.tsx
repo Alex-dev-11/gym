@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Layout as AntLayout, Menu, Button } from 'antd';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
@@ -31,24 +31,33 @@ export function Layout() {
   }, []);
 
   const userStr = localStorage.getItem('user');
-  const userFullName = userStr ? JSON.parse(userStr).fullName : 'Пользователь';
-  const userRole = userStr ? JSON.parse(userStr).role : null;
+  
+  const userInfo = useMemo(() => {
+    if (userStr) {
+      try {
+        return JSON.parse(userStr);
+      } catch {
+        return { fullName: 'Пользователь', role: null };
+      }
+    }
+    return { fullName: 'Пользователь', role: null };
+  }, [userStr]);
   
   const handleLogout = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  window.location.href = '/login'; // Жёсткий редирект, гарантированно сбрасывает состояние
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/login';
   };
 
-  const menuItems = [
+  const menuItems = useMemo(() => [
     { key: '/clients', icon: <UserOutlined />, label: 'Клиенты' },
     { key: '/memberships', icon: <CreditCardOutlined />, label: 'Абонементы' },
     { key: '/visits', icon: <CalendarOutlined />, label: 'Посещения' },
-    ...(userRole === 'admin' ? [
-    { key: '/employees', icon: <TeamOutlined />, label: 'Сотрудники' },
-    { key: '/users', icon: <SettingOutlined />, label: 'Пользователи' }
-  ] : []),
-  ];
+    ...(userInfo.role === 'admin' ? [
+      { key: '/employees', icon: <TeamOutlined />, label: 'Сотрудники' },
+      { key: '/users', icon: <SettingOutlined />, label: 'Пользователи' }
+    ] : []),
+  ], [userInfo.role]);
 
   return (
     <AntLayout style={{ minHeight: '100vh', minWidth: '100vw', overflowX: 'hidden' }}>
@@ -125,20 +134,20 @@ export function Layout() {
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <span className="hidden sm:inline text-gray-600 text-sm font-medium">
-            {userFullName}
-          </span>
-          <Button 
-            type="default" 
-            danger 
-            ghost 
-            icon={<LogoutOutlined />} 
-            onClick={handleLogout}
-            title="Выйти из системы"
-          >
-            <span className="hidden sm:inline">Выйти</span>
-          </Button>
-        </div>
+            <span className="hidden sm:inline text-gray-600 text-sm font-medium">
+              {userInfo.fullName}
+            </span>
+            <Button 
+              type="default" 
+              danger 
+              ghost 
+              icon={<LogoutOutlined />} 
+              onClick={handleLogout}
+              title="Выйти из системы"
+            >
+              <span className="hidden sm:inline">Выйти</span>
+            </Button>
+          </div>
         </Header>
 
         <Content style={{ 

@@ -1,4 +1,3 @@
-// src/hooks/useMemberships.ts
 import { useState, useEffect, useCallback } from "react";
 import { membershipsApi, type MembershipsFilter } from "../api/memberships";
 import type { MembershipResponseDto } from "../types";
@@ -12,8 +11,8 @@ export function useMemberships(initialFilter?: MembershipsFilter) {
   const reload = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await membershipsApi.getAll(filter);
-      setMemberships(response.data);
+      const data = await membershipsApi.getAll(filter);
+      setMemberships(data);
       setError(null);
     } catch (err) {
       setError("Не удалось загрузить список абонементов");
@@ -28,9 +27,9 @@ export function useMemberships(initialFilter?: MembershipsFilter) {
 
     const loadData = async () => {
       try {
-        const response = await membershipsApi.getAll(filter);
+        const data = await membershipsApi.getAll(filter);
         if (isMounted) {
-          setMemberships(response.data);
+          setMemberships(data);
           setError(null);
         }
       } catch (err) {
